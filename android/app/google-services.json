@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "80260878126",
+    "project_id": "cryptel-007",
+    "storage_bucket": "cryptel-007.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:80260878126:android:92795dde1b058cfdb134bf",
+        "android_client_info": {
+          "package_name": "com.example.cryptel007"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVBXX3v7pBtoYZqNj_QSSN9XEkQGAhfaM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
