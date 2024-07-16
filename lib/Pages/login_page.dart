@@ -1,4 +1,5 @@
 import 'package:cryptel007/Pages/home_page.dart';
+import 'package:cryptel007/Tools/bottom_nav.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +61,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         // Navigate to home page on successful sign-in
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(builder: (context) => const BottomNavPage()),
         );
       }
     } catch (e) {
