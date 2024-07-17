@@ -72,7 +72,7 @@ class HomePage extends StatelessWidget {
                         border: InputBorder.none,
                         labelText: 'WorkOrderNo.',
                         labelStyle: TextStyle(
-                          color: AppColors.darkRoyalBlue,
+                          color: AppColors.logoblue,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -99,7 +99,7 @@ class HomePage extends StatelessWidget {
                         border: InputBorder.none,
                         labelText: 'Password',
                         labelStyle: TextStyle(
-                          color: AppColors.darkRoyalBlue,
+                          color: AppColors.logoblue,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -108,7 +108,7 @@ class HomePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 30),
                   CustomButton(
-                    buttonColor: AppColors.darkRoyalBlue,
+                    buttonColor: AppColors.logoblue,
                     text: 'Enter',
                     onPressed: () async {
                   await logout();
