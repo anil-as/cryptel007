@@ -29,7 +29,7 @@ class AuthMethods {
             'uid': user.uid,
             'profilePhoto': user.photoURL,
             'email': user.email,
-            'role': 'user', // Default role is user
+            'role': 'USER',
           });
         }
         result = true;

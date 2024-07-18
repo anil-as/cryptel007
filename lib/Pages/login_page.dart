@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cryptel007/Tools/bottom_nav.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:cryptel007/auth.dart';

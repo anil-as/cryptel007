@@ -1,7 +1,7 @@
 
-import 'package:cryptel007/Pages/home_page.dart';
-import 'package:cryptel007/Pages/manage_page.dart';
-import 'package:cryptel007/Pages/profile_page.dart';
+import 'package:cryptel007/Pages/Main%20Pages/home_page.dart';
+import 'package:cryptel007/Pages/Main%20Pages/manage_page.dart';
+import 'package:cryptel007/Pages/Main%20Pages/settings_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +19,7 @@ class _BottomNavPageState extends State<BottomNavPage> {
   static const List<Widget> _widgetOptions = <Widget>[
     ManagePage(),
     HomePage(),
-    ProfilePage(),
+    SettingsPage(),
   ];
 
   @override
@@ -30,9 +30,9 @@ class _BottomNavPageState extends State<BottomNavPage> {
       ),
       bottomNavigationBar: CurvedNavigationBar(
         items: const [
-          Icon(Icons.settings_suggest_rounded, color: Colors.white),
+          Icon(Icons.topic_outlined, color: Colors.white),
           Icon(Icons.home_rounded, color: Colors.white),
-          Icon(Icons.person, color: Colors.white),
+          Icon(Icons.settings_suggest_rounded, color: Colors.white),
         ],
         color: AppColors.logoblue,
         backgroundColor: Colors.transparent,

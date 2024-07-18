@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   static const Color logoblue = Color(0xFF2D2E92);
+  static const Color lightblue = Color(0xFFCADCFC);
 
   // Dark Royal Blue Shades
   static const Color royalBlue = Color(0xFF002366);
