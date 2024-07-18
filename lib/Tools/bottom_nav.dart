@@ -1,7 +1,7 @@
 
 import 'package:cryptel007/Pages/home_page.dart';
 import 'package:cryptel007/Pages/manage_page.dart';
-import 'package:cryptel007/Pages/settings_page.dart';
+import 'package:cryptel007/Pages/profile_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +19,7 @@ class _BottomNavPageState extends State<BottomNavPage> {
   static const List<Widget> _widgetOptions = <Widget>[
     ManagePage(),
     HomePage(),
-    SettingsPage(),
+    ProfilePage(),
   ];
 
   @override

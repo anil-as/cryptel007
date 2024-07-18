@@ -1,10 +1,8 @@
-import 'package:cryptel007/Pages/home_page.dart';
 import 'package:cryptel007/Tools/bottom_nav.dart';
 import 'package:cryptel007/Tools/colors.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cryptel007/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -47,22 +45,17 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     });
 
     try {
-      FirebaseAuth auth = FirebaseAuth.instance;
-      final GoogleSignIn googleSignIn = GoogleSignIn();
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-      if (googleUser != null) {
-        final GoogleSignInAuthentication googleAuth =
-            await googleUser.authentication;
-        final AuthCredential credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-        await auth.signInWithCredential(credential);
+      bool result = await AuthMethods()
+          .signInWithGoogle(); // Call signInWithGoogle from AuthMethods
+
+      if (result) {
         // Navigate to home page on successful sign-in
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const BottomNavPage()),
         );
+      } else {
+        // Handle sign-in failure if needed
       }
     } catch (e) {
       print('Failed to sign in with Google: $e');
@@ -123,7 +116,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     ) // Show loading indicator
                   : GestureDetector(
                       onTap: () async {
-                        await signInWithGoogle();
+                        await  signInWithGoogle();
                       },
                       child: Container(
                         width: screenWidth * 0.9,

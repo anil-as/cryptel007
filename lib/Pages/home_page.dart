@@ -1,38 +1,52 @@
+import 'package:cryptel007/Pages/admin_page.dart';
 import 'package:cryptel007/Pages/login_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:cryptel007/Tools/custom_button.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class HomePage extends StatelessWidget {
-   Future<void> logout() async {
+  Future<void> logout() async {
     final GoogleSignIn googleSign = GoogleSignIn();
     await googleSign.signOut();
   }
+
   const HomePage({super.key});
 
- 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     appBar: AppBar(
-              backgroundColor: Colors.white,
-              automaticallyImplyLeading: false,
-              toolbarHeight: 80,
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    'assets/logoblue.png',
-                    width: 80,
-                    height: 80,
-                  ),
-                 
-                ],
-              ),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 80,
+        title: const Row(
+          children: [
+            SizedBox(
+              width: 17,
             ),
-      
+            Text('Cryptel',
+                style: TextStyle(
+                  fontFamily: 'Raleway',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 32.0,
+                  color: Colors.black,
+                )),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.admin_panel_settings_outlined,
+                color: Colors.black),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AdminPage()),
+              );
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
@@ -55,7 +69,8 @@ class HomePage extends StatelessWidget {
                 children: [
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 16),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -82,7 +97,8 @@ class HomePage extends StatelessWidget {
                   const SizedBox(height: 20),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 16),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -111,13 +127,14 @@ class HomePage extends StatelessWidget {
                     buttonColor: AppColors.logoblue,
                     text: 'Enter',
                     onPressed: () async {
-                  await logout();
-                  Navigator.pushReplacement(
-                    // ignore: use_build_context_synchronously
-                    context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
-                  );
-                },
+                      await logout();
+                      Navigator.pushReplacement(
+                        // ignore: use_build_context_synchronously
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginPage()),
+                      );
+                    },
                     borderRadius: 12,
                     suffixIcon: Icons.arrow_right,
                   ),
