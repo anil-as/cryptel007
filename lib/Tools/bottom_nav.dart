@@ -1,7 +1,7 @@
 
-import 'package:cryptel007/Pages/Main%20Pages/home_page.dart';
-import 'package:cryptel007/Pages/Main%20Pages/manage_page.dart';
-import 'package:cryptel007/Pages/Main%20Pages/settings_page.dart';
+import 'package:cryptel007/Pages/Navigation%20Pages/home_page.dart';
+import 'package:cryptel007/Pages/Navigation%20Pages/manage_page.dart';
+import 'package:cryptel007/Pages/Navigation%20Pages/settings_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';

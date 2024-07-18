@@ -1,4 +1,4 @@
-import 'package:cryptel007/Pages/login_page.dart';
+import 'package:cryptel007/Pages/Core%20Pages/login_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:cryptel007/Tools/custom_button.dart';
 import 'package:flutter/material.dart';

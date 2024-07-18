@@ -1,4 +1,4 @@
-import 'package:cryptel007/Pages/login_page.dart';
+import 'package:cryptel007/Pages/Core%20Pages/login_page.dart';
 import 'package:cryptel007/firebase_options.dart';
 import 'package:cryptel007/main_page.dart';
 import 'package:firebase_core/firebase_core.dart';

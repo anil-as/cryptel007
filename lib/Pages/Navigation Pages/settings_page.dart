@@ -1,18 +1,14 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cryptel007/Pages/login_page.dart';
+import 'package:cryptel007/Pages/Core%20Pages/add_work_page.dart';
+import 'package:cryptel007/Pages/Core%20Pages/login_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import '../Sub Pages/admin_page.dart'; // import your admin page here
+import '../Sub Pages/admin_page.dart'; // Import your admin page here
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
-
-  Future<void> logout() async {
-    final GoogleSignIn googleSign = GoogleSignIn();
-    await googleSign.signOut();
-  }
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -63,6 +59,14 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  Future<void> logout() async {
+    await _googleSignIn.signOut();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,17 +75,16 @@ class _SettingsPageState extends State<SettingsPage> {
         title: const Text('Settings', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.grey[200],
         elevation: 0,
-       
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
                   Card(
                     color: Colors.white,
-                    elevation: 2, // Reduced shadow
+                    elevation: 2,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -103,7 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             _currentUser?.email ?? '',
                             style: const TextStyle(fontSize: 16, color: Colors.grey),
                           ),
-                          const SizedBox(height: 4), // Add some space between the texts
+                          const SizedBox(height: 4),
                           Text(
                             _userRole ?? '',
                             style: const TextStyle(fontSize: 16, color: AppColors.logoblue),
@@ -119,7 +122,14 @@ class _SettingsPageState extends State<SettingsPage> {
                           icon: Icons.add,
                           title: 'Add Work',
                           onTap: () {
-                            // Handle Account tap
+                            if (_userRole == 'ADMIN' || _userRole == 'Manager' || _userRole == 'Editor') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const AddWorkPage()),
+                              );
+                            } else {
+                              _showAccessDeniedDialog();
+                            }
                           },
                         ),
                         _buildCardTile(
@@ -174,7 +184,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildCardTile({required IconData icon, required String title, required VoidCallback onTap}) {
     return Card(
       color: Colors.white,
-      elevation: 2, // Reduced shadow
+      elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -210,13 +220,7 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
             ElevatedButton(
-              onPressed: () {
-                _googleSignIn.signOut();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
-              },
+              onPressed: logout,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.logoblue,
                 shape: RoundedRectangleBorder(
@@ -244,7 +248,7 @@ class _SettingsPageState extends State<SettingsPage> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           content: const Text(
-            'Only admins have access to this section.',
+            'Only authorized users have access to this section.',
             style: TextStyle(fontSize: 16),
           ),
           actions: <Widget>[
