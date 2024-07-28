@@ -8,7 +8,6 @@ class AdminPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
     final double cardPadding = screenWidth * 0.05;
     final double avatarRadius = screenWidth * 0.075;
     final double textFontSize = screenWidth * 0.045;

@@ -12,6 +12,8 @@ class CustomButton extends StatefulWidget {
   final double h;
   final double w;
   final IconData? suffixIcon;
+  final MainAxisAlignment textAlign;
+  final Color iconColor;
 
   const CustomButton({
     Key? key,
@@ -26,6 +28,8 @@ class CustomButton extends StatefulWidget {
     this.h = 50,
     this.w = double.infinity,
     this.suffixIcon,
+    this.textAlign = MainAxisAlignment.center,
+    this.iconColor = Colors.white,
   }) : super(key: key);
 
   @override
@@ -33,40 +37,37 @@ class CustomButton extends StatefulWidget {
 }
 
 class _CustomButtonState extends State<CustomButton> {
-  bool _isHovered = false;
+  final bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: ElevatedButton(
-        onPressed: widget.onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _isHovered ? widget.hoverColor : widget.buttonColor,
-          foregroundColor: widget.textColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(widget.borderRadius),
-          ),
-          minimumSize: Size(widget.w, widget.h),
+    return ElevatedButton(
+      onPressed: widget.onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: _isHovered ? widget.hoverColor : widget.buttonColor,
+        foregroundColor: widget.textColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(widget.borderRadius),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              widget.text,
-              style: TextStyle(
-                fontSize: widget.fsize,
-                fontFamily: 'Strait',
-                fontWeight: FontWeight.bold,
-              ),
+        minimumSize: Size(widget.w, widget.h),
+      ),
+      child: Row(
+        mainAxisAlignment: widget.suffixIcon == null ? widget.textAlign : MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            widget.text,
+            style: TextStyle(
+              fontSize: widget.fsize,
+              fontFamily: 'Strait',
+              fontWeight: FontWeight.bold,
             ),
-            if (widget.suffixIcon != null)
-              SizedBox(
-                width: 24,
-                child: Icon(widget.suffixIcon, size: widget.iconsize),
-              ),
-          ],
-        ),
+          ),
+          if (widget.suffixIcon != null)
+            SizedBox(
+              width: 24,
+              child: Icon(widget.suffixIcon, size: widget.iconsize, color: widget.iconColor),
+            ),
+        ],
       ),
     );
   }

@@ -1,8 +1,9 @@
+import 'package:cryptel007/Pages/Core Pages/work_detail_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
+import 'package:cryptel007/Tools/custom_button.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
-
-import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddWorkPage extends StatefulWidget {
   const AddWorkPage({super.key});
@@ -13,21 +14,73 @@ class AddWorkPage extends StatefulWidget {
 
 class _AddWorkPageState extends State<AddWorkPage> {
   final _formKey = GlobalKey<FormState>();
-  String _selectedTenderType = 'Type A';
-  bool _useSpecialTools = false;
-  File? _workImage;
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  String _workOrderNumber = '';
+  String _password = '';
+  final DateTime _creationDate = DateTime.now();
+  final TextEditingController _contactNameController = TextEditingController();
+  final TextEditingController _contactNumberController =
+      TextEditingController();
+  final List<Map<String, String>> _contacts = [];
 
+  void _addContact() {
+    final name = _contactNameController.text;
+    final number = _contactNumberController.text;
+    if (name.isNotEmpty && number.isNotEmpty) {
+      setState(() {
+        _contacts.add({'name': name, 'number': number});
+        _contactNameController.clear();
+        _contactNumberController.clear();
+      });
+    }
+  }
+
+  void _removeContact(int index) {
     setState(() {
-      if (pickedFile != null) {
-        _workImage = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
+      _contacts.removeAt(index);
     });
+  }
+
+  Future<void> _saveData() async {
+    if (_formKey.currentState!.validate()) {
+      final workData = {
+        'WorkTitle': _workOrderNumber,
+        'WorkDescription': _password,
+        'workOrderNumber': _workOrderNumber,
+        'creationDate': _creationDate,
+        'contacts': _contacts,
+        'password': _password
+      };
+
+      // Save data to 'work' collection
+      await FirebaseFirestore.instance
+          .collection('work')
+          .doc(_workOrderNumber)
+          .set(workData);
+
+      // Create subcollection 'jobcard' and add a document with workOrderNumber as the ID
+      await FirebaseFirestore.instance
+          .collection('work')
+          .doc(_workOrderNumber)
+          .collection('jobcard')
+          .doc(_workOrderNumber)
+          .set({
+        'status': 'Initialized', // Add any default data if needed
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Data successfully saved')),
+      );
+
+      // Navigate to WorkDetailPage
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              WorkDetailPage(workOrderNumber: _workOrderNumber),
+        ),
+      );
+    }
   }
 
   @override
@@ -44,119 +97,169 @@ class _AddWorkPageState extends State<AddWorkPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Tender Details',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.logoblue,
-                ),
-              ),
-              const SizedBox(height: 20),
               TextFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Tender Title',
+                  labelText: 'Work Title',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter the tender title';
+                    return 'Please enter the Work title';
                   }
                   return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _workOrderNumber = value; // Ensure workOrderNumber is set
+                  });
                 },
               ),
               const SizedBox(height: 20),
               TextFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Tender Description',
+                  labelText: 'Work Description',
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter the tender description';
+                    return 'Please enter the Work description';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _password = value; // Ensure password is set
+                  });
+                },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Work Order Number',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _workOrderNumber = value;
+                  });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the work order number';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Tender Type',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              ListTile(
-                title: const Text('Type A'),
-                leading: Radio<String>(
-                  value: 'Type A',
-                  groupValue: _selectedTenderType,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedTenderType = value!;
-                    });
-                  },
-                ),
-              ),
-              ListTile(
-                title: const Text('Type B'),
-                leading: Radio<String>(
-                  value: 'Type B',
-                  groupValue: _selectedTenderType,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedTenderType = value!;
-                    });
-                  },
-                ),
+              Text(
+                'Creation Date: ${DateFormat('yyyy-MM-dd – kk:mm').format(_creationDate)}',
+                style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 20),
               const Text(
-                'Use Special Tools',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SwitchListTile(
-                title: const Text('Special Tools Required'),
-                value: _useSpecialTools,
-                onChanged: (value) {
-                  setState(() {
-                    _useSpecialTools = value;
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Work Image',
+                'Contact Info',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-              GestureDetector(
-                onTap: _pickImage,
-                child: Container(
-                  height: 200,
-                  width: double.infinity,
-                  color: Colors.grey[200],
-                  child: _workImage == null
-                      ? const Icon(Icons.add_a_photo, size: 50)
-                      : Image.file(_workImage!, fit: BoxFit.cover),
+              TextFormField(
+                controller: _contactNameController,
+                decoration: const InputDecoration(
+                  labelText: 'Contact Name',
+                  border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _contactNumberController,
+                decoration: const InputDecoration(
+                  labelText: 'Contact Number',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.phone,
+              ),
+              const SizedBox(height: 10),
+              CustomButton(
+                buttonColor: Colors.white,
+                textColor: Colors.black,
+                text: 'Add Contact',
+                suffixIcon: Icons.add,
+                iconColor: AppColors.logoblue,
+                onPressed: _addContact,
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: _contacts.length,
+                itemBuilder: (context, index) {
+                  final contact = _contacts[index];
+                  return Card(
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4.0),
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 10.0),
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.blue,
+                        child: Text(
+                          contact['name']![0],
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      title: Text(
+                        contact['name']!,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        contact['number']!,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      trailing: IconButton(
+                        icon:
+                            const Icon(Icons.remove_circle, color: Colors.red),
+                        onPressed: () => _removeContact(index),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Password',
+                  border: OutlineInputBorder(),
+                ),
+                obscureText: true,
+                onChanged: (value) {
+                  setState(() {
+                    _password = value;
+                  });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a password';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(
+                height: 20,
+              ),
               Center(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.logoblue,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 50, vertical: 15),
-                    textStyle: const TextStyle(fontSize: 18),
-                  ),
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Process the form data
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Processing Data')),
-                      );
-                    }
-                  },
-                  child: const Text('Submit'),
+                child: CustomButton(
+                  borderRadius: 22,
+                  h: 70,
+                  text: 'Create',
+                  fsize: 24,
+                  onPressed: _saveData,
+                  buttonColor: AppColors.logoblue,
                 ),
               ),
             ],

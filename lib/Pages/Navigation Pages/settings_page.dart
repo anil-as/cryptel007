@@ -115,86 +115,105 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ),
                   ),
-                  Expanded(
-                    child: ListView(
-                      children: [
-                        _buildCardTile(
-                          icon: Icons.add,
-                          title: 'Add Work',
-                          onTap: () {
-                            if (_userRole == 'ADMIN' || _userRole == 'Manager' || _userRole == 'Editor') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const AddWorkPage()),
-                              );
-                            } else {
-                              _showAccessDeniedDialog();
-                            }
-                          },
-                        ),
-                        _buildCardTile(
-                          icon: Icons.notifications,
-                          title: 'Notifications',
-                          onTap: () {
-                            // Handle Notifications tap
-                          },
-                        ),
-                        _buildCardTile(
-                          icon: Icons.security,
-                          title: 'Control Hub',
-                          onTap: () {
-                            if (_userRole == 'ADMIN') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const AdminPage()),
-                              );
-                            } else {
-                              _showAccessDeniedDialog();
-                            }
-                          },
-                        ),
-                        _buildCardTile(
-                          icon: Icons.help,
-                          title: 'Help & Support',
-                          onTap: () {
-                            // Handle Help & Support tap
-                          },
-                        ),
-                        _buildCardTile(
-                          icon: Icons.info,
-                          title: 'About',
-                          onTap: () {
-                            // Handle About tap
-                          },
-                        ),
-                        _buildCardTile(
-                          icon: Icons.logout_rounded,
-                          title: 'Logout',
-                          onTap: _showLogoutDialog,
-                        ),
-                      ],
-                    ),
-                  ),
+                 Expanded(
+  child: GridView.count(
+    crossAxisCount: 2, // Number of cards per row
+    childAspectRatio: 1.5, // Aspect ratio of each card
+    children: [
+      _buildCardTile(
+        icon: Icons.add,
+        title: 'Add Work',
+        color: AppColors.logoblue,
+        onTap: () {
+          if (_userRole == 'ADMIN' || _userRole == 'Manager' || _userRole == 'Editor') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddWorkPage()),
+            );
+          } else {
+            _showAccessDeniedDialog();
+          }
+        },
+      ),
+      _buildCardTile(
+        icon: Icons.notifications,
+        title: 'Notifications',
+        color:AppColors.logoblue,
+        onTap: () {
+          // Handle Notifications tap
+        },
+      ),
+      _buildCardTile(
+        icon: Icons.security,
+        title: 'Control Hub',
+        color:AppColors.logoblue,
+        onTap: () {
+          if (_userRole == 'ADMIN') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AdminPage()),
+            );
+          } else {
+            _showAccessDeniedDialog();
+          }
+        },
+      ),
+      _buildCardTile(
+        icon: Icons.help,
+        title: 'Help & Support',
+        color:AppColors.logoblue,
+        onTap: () {
+          // Handle Help & Support tap
+        },
+      ),
+      _buildCardTile(
+        icon: Icons.info,
+        title: 'About',
+        color:AppColors.logoblue,
+        onTap: () {
+          // Handle About tap
+        },
+      ),
+      _buildCardTile(
+        icon: Icons.logout_rounded,
+        title: 'Logout',
+        color:AppColors.logoblue,
+        onTap: _showLogoutDialog,
+      ),
+    ],
+  ),
+)
                 ],
               ),
             ),
     );
   }
-
-  Widget _buildCardTile({required IconData icon, required String title, required VoidCallback onTap}) {
-    return Card(
-      color: Colors.white,
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+Widget _buildCardTile({
+  required IconData icon,
+  required String title,
+  required Color color,
+  required VoidCallback onTap,
+}) {
+  return Card(
+    elevation: 5,
+    color: color, // Use the provided color for the card
+    child: InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 40, color: Colors.white), // Use white color for the icon
+            const SizedBox(height: 16),
+            Text(title, style: const TextStyle(fontSize: 16, color: Colors.white)), // Use white color for the text
+          ],
+        ),
       ),
-      child: ListTile(
-        leading: Icon(icon, color: Colors.black),
-        title: Text(title, style: const TextStyle(fontSize: 18)),
-        onTap: onTap,
-      ),
-    );
-  }
+    ),
+  );
+}
+ 
 
   void _showLogoutDialog() {
     showDialog(
