@@ -37,11 +37,13 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_launcher_icons: ^0.13.1
+  flutter_phone_direct_caller: ^2.1.1
   google_fonts: ^6.2.1
   google_sign_in: ^6.2.1
   image_picker: ^1.1.2
   intl: ^0.19.0
   percent_indicator: ^4.2.3
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_lints: ^3.0.0
@@ -58,6 +60,8 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/arrow.png 
+    - assets/work.png
     - assets/apklogo.png
     - assets/google.png
     - assets/whitelogo.png

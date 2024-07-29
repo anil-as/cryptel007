@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cryptel007/Tools/colors.dart';
+import 'package:cryptel007/Tools/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 class WorkDetailPage extends StatelessWidget {
   final String workOrderNumber;
@@ -12,19 +15,37 @@ class WorkDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Work Details - $workOrderNumber',
-          style: GoogleFonts.raleway(color: Colors.black),
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 10.0),
+          child: IconButton(
+            icon: Image.asset('assets/arrow.png'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            iconSize: 7,
+          ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.settings_suggest_sharp, // Settings icon
+              color: Colors.black,
+              size: 34, // Adjust the size as needed
+            ),
+            onPressed: () {
+              // Add your onPressed logic here
+            },
+          )
+        ],
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.black),
         elevation: 0,
       ),
-      body: FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
             .collection('work')
             .doc(workOrderNumber)
-            .get(),
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -64,60 +85,52 @@ class WorkDetailPage extends StatelessWidget {
             );
           }
 
+          final double percentage = workData['percentage'] != null
+              ? workData['percentage'] / 100.0
+              : 0.5;
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildInfoCard(
-                  title: 'Work Title',
-                  content: workData['WorkTitle'] ?? 'N/A',
-                  icon: Icons.title,
-                ),
-                const SizedBox(height: 20),
-                _buildInfoCard(
-                  title: 'Work Description',
-                  content: workData['WorkDescription'] ?? 'N/A',
-                  icon: Icons.description,
-                ),
-                const SizedBox(height: 20),
-                _buildInfoCard(
-                  title: 'Work Order Number',
-                  content: workOrderNumber,
-                  icon: Icons.confirmation_number,
-                ),
-                const SizedBox(height: 20),
-                _buildInfoCard(
-                  title: 'Creation Date',
-                  content: workData['creationDate'] != null
-                      ? DateFormat('yyyy-MM-dd – kk:mm').format(
+                _buildTitleCard(
+                  Subtitle: workData['creationDate'] != null
+                      ? DateFormat('yyyy-MM-dd – hh:mm').format(
                           (workData['creationDate'] as Timestamp).toDate(),
                         )
                       : 'N/A',
-                  icon: Icons.date_range,
+                  title: 'Work Title',
+                  content: workData['WorkTitle'] ?? 'N/A',
+                  icon: Icons.title,
+                  percentage: percentage,
+                ),
+                const SizedBox(height: 20),
+                _buildInfoCard(
+                  content: (workData['WorkDescription'] ?? 'N/A').toUpperCase(),
+                  title: 'Description',
+                ),
+                const SizedBox(height: 20),
+                _buildInfoCard(
+                  title: 'Work Order No',
+                  content: workOrderNumber,
                 ),
                 const SizedBox(height: 20),
                 _buildContactInfo(
                   contacts: workData['contacts'] as List<dynamic>? ?? [],
                 ),
-                const SizedBox(height: 40),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 15,
-                      ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child:CustomButton(text: 'Go to Jobcard', onPressed: (){})
                     ),
-                    child: const Text('Back', style: TextStyle(fontSize: 16)),
-                  ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child:CustomButton(text: 'Go to Drawings', onPressed: (){})
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -127,8 +140,13 @@ class WorkDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard(
-      {required String title, required String content, required IconData icon}) {
+  Widget _buildTitleCard({
+    required String title,
+    required String content,
+    required String Subtitle,
+    required IconData icon,
+    required double percentage,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -144,24 +162,94 @@ class WorkDetailPage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, color: Colors.blue, size: 30),
-          const SizedBox(width: 15),
+          Image.asset(
+            'assets/work.png',
+            width: 70,
+            height: 70,
+          ),
+          const SizedBox(width: 37),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
-                  style: GoogleFonts.raleway(
+                  Subtitle,
+                  style: GoogleFonts.strait(fontSize: 17, color: Colors.black),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  content.toUpperCase(),
+                  style: GoogleFonts.strait(fontSize: 27, color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+          CircularPercentIndicator(
+            radius: 40.0,
+            lineWidth: 8.0,
+            percent: percentage,
+            center: Text(
+              '${(percentage * 100).toStringAsFixed(1)}%',
+              style: GoogleFonts.dmSans(
+                fontSize: 14,
+                color: Colors.black,
+              ),
+            ),
+            progressColor: Colors.blue,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoCard({
+    String? title,
+    required String content,
+    IconData? icon,
+    bool showTitle = true,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey[200]!,
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (icon != null)
+            Icon(icon, color: AppColors.logoblue, size: 30),
+          if (icon != null) const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (showTitle && title != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: Text(
+                      title,
+                      style: GoogleFonts.dmSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.logoblue,
+                      ),
+                    ),
+                  ),
+                Text(
+                  content,
+                  style: GoogleFonts.dmSans(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  content,
-                  style: GoogleFonts.raleway(fontSize: 16, color: Colors.black87),
                 ),
               ],
             ),
@@ -186,7 +274,8 @@ class WorkDetailPage extends StatelessWidget {
         final contactMap = contact as Map<String, dynamic>;
         return _buildInfoCard(
           title: 'Contact Info',
-          content: 'Name: ${contactMap['name']}\nNumber: ${contactMap['number']}',
+          content:
+              'Name: ${contactMap['name']}\nNumber: ${contactMap['number']}',
           icon: Icons.contact_phone,
         );
       }).toList(),

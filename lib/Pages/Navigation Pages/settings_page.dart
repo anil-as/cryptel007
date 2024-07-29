@@ -115,6 +115,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ),
                   ),
+                        const SizedBox(height: 20,),
+
                  Expanded(
   child: GridView.count(
     crossAxisCount: 2, // Number of cards per row
