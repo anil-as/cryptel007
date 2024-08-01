@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cryptel007/Pages/Core%20Pages/specific_work_page.dart';
 import 'package:cryptel007/Pages/Navigation%20Pages/home_page.dart';
 import 'package:cryptel007/Pages/Seperated%20Class/details_container.dart';
 import 'package:cryptel007/Pages/Seperated%20Class/work_header.dart';
@@ -72,22 +73,16 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
           },
         ),
         actions: [
-          if (_userRole == 'ADMIN' ||
+            if (_userRole == 'ADMIN' ||
               _userRole == 'Manager' ||
               _userRole == 'Editor')
-            CustomButton(
-              text: 'Edit',
-              onPressed: () {
-                // Handle edit action
-              },
-              h: 37,
-              w: 37,
-              buttonColor: Colors.white,
-              textColor: AppColors.logoblue,
-              suffixIcon: Icons.edit_square,
-              iconColor: AppColors.logoblue,
-            ),
-          const SizedBox(width: 17),
+            IconButton(
+            icon: Image.asset('assets/edit.png'),
+            onPressed: () {
+              // Handle bookmark action
+            },
+          ),
+          const SizedBox(width: 7),
           IconButton(
             icon: Image.asset('assets/bookmark.png'),
             onPressed: () {
@@ -143,6 +138,68 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                               textScaleFactor: textScaleFactor,
                             ),
                           ),
+                         
+                            Padding(
+                              padding: EdgeInsets.all(screenWidth * 0.04),
+                              child: Column(
+                                children: [
+                                  CustomButton(
+                                    text: 'Work Status',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                 SpecificWorkPage(workOrderNumber: data['WONUMBER'] ,)),
+                                      );
+                                    },
+                                    h: 47,
+                                    w: double.infinity,
+                                    buttonColor: Colors.yellow,
+                                    textColor: Colors.black,
+                                  ),
+                                  SizedBox(height: screenWidth * 0.02),
+                                  CustomButton(
+                                    text: 'Certification',
+                                    onPressed: () {
+                                      // Handle button 2 action
+                                    },
+                                    h: 47,
+                                    w: double.infinity,
+                                    buttonColor: AppColors.lightblue,
+                                    textColor: Colors.black,
+                                  ),
+                                  SizedBox(height: screenWidth * 0.02),
+                                   if (_userRole == 'ADMIN' ||
+                              _userRole == 'Manager' ||
+                              _userRole == 'Editor')
+                                  CustomButton(
+                                    text: 'Button 3',
+                                    onPressed: () {
+                                      // Handle button 3 action
+                                    },
+                                    h: 47,
+                                    w: double.infinity,
+                                    buttonColor: AppColors.logoblue,
+                                    textColor: Colors.white,
+                                  ),
+                                  SizedBox(height: screenWidth * 0.02),
+                                   if (_userRole == 'ADMIN' ||
+                              _userRole == 'Manager' ||
+                              _userRole == 'Editor')
+                                  CustomButton(
+                                    text: 'Button 4',
+                                    onPressed: () {
+                                      // Handle button 4 action
+                                    },
+                                    h: 47,
+                                    w: double.infinity,
+                                    buttonColor: AppColors.logoblue,
+                                    textColor: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
                         ],
                       );
                     },

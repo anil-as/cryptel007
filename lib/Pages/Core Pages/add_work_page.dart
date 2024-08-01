@@ -1,10 +1,10 @@
 import 'dart:io';
+import 'package:cryptel007/Pages/Core%20Pages/specific_work_page.dart';
 import 'package:cryptel007/Pages/Core%20Pages/work_detail_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:cryptel007/Tools/custom_button.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,7 +20,7 @@ class _AddWorkPageState extends State<AddWorkPage> {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _isLoading = false; // Added loading state
+  bool _isLoading = false; // Loading state
 
   String _worktitle = '';
   String _workOrderNumber = '';
@@ -32,89 +32,87 @@ class _AddWorkPageState extends State<AddWorkPage> {
   String _acplfocalpointNumber = '';
   String _password = '';
   final DateTime _creationDate = DateTime.now();
-  XFile? _photo; // To store selected image
+  XFile? _photo; // Selected image
 
   Future<void> _saveData() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true; // Set loading to true
-      });
+    if (!_formKey.currentState!.validate()) return;
 
-      String? photoUrl;
+    setState(() {
+      _isLoading = true;
+    });
 
-      // If a photo was selected, upload it to Firebase Storage
-      if (_photo != null) {
-        try {
-          // Create a reference to Firebase Storage
-          final storageRef = FirebaseStorage.instance
-              .ref()
-              .child('workphotos/$_workOrderNumber.jpg');
+    String? photoUrl;
 
-          // Upload the photo
-          final uploadTask = storageRef.putFile(File(_photo!.path));
-          final snapshot = await uploadTask.whenComplete(() => {});
-          photoUrl = await snapshot.ref.getDownloadURL();
-        } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error uploading photo: $e')),
-          );
-          setState(() {
-            _isLoading = false; // Set loading to false on error
-          });
-          return; // Exit if photo upload fails
-        }
-      }
-
-      // Prepare the data to save in Firestore
-      final workData = {
-        'WORKTITLE': _worktitle,
-        'WONUMBER': _workOrderNumber,
-        'PONUMBER': _purchaseordernumber,
-        'CUSTOMERNAME': _customername,
-        'CDATE': _creationDate,
-        'FOCALPOINTNAME': _focalpointName,
-        'FOCALPOINTNUMBER': _focalpointNumber,
-        'ACPLFOCALPOINTNAME': _acplfocalpointName,
-        'ACPLFOCALPOINTNUMBER': _acplfocalpointNumber,
-        'PASSWORD': _password,
-        'EDITEDDATE': _creationDate, // Set initial edited date to creation date
-        'PHOTO': photoUrl ?? null, // Handle null photo URL
-      };
-
-      try {
-        // Save data to Firestore
-        await FirebaseFirestore.instance
-            .collection('works')
-            .doc(_workOrderNumber)
-            .set(workData);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Data successfully saved')),
-        );
-
-        // Navigate to WorkDetailPage
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                WorkDetailPage(workOrderNumber: _workOrderNumber),
-          ),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving data: $e')),
-        );
-      } finally {
+    if (_photo != null) {
+      photoUrl = await _uploadPhoto();
+      if (photoUrl == null) {
         setState(() {
-          _isLoading = false; // Set loading to false after processing
+          _isLoading = false;
         });
+        return;
       }
     }
+
+    final workData = {
+      'WORKTITLE': _worktitle,
+      'WONUMBER': _workOrderNumber,
+      'PONUMBER': _purchaseordernumber,
+      'CUSTOMERNAME': _customername,
+      'CDATE': _creationDate,
+      'FOCALPOINTNAME': _focalpointName,
+      'FOCALPOINTNUMBER': _focalpointNumber,
+      'ACPLFOCALPOINTNAME': _acplfocalpointName,
+      'ACPLFOCALPOINTNUMBER': _acplfocalpointNumber,
+      'PASSWORD': _password,
+      'EDITEDDATE': _creationDate,
+      'PHOTO': photoUrl,
+    };
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('works')
+          .doc(_workOrderNumber)
+          .set(workData);
+
+      _showSnackBar('Data successfully saved');
+      Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => SpecificWorkPage(workOrderNumber: _workOrderNumber),
+  ),
+);
+
+    } catch (e) {
+      _showSnackBar('Error saving data: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<String?> _uploadPhoto() async {
+    try {
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('workphotos/$_workOrderNumber.jpg');
+
+      final uploadTask = storageRef.putFile(File(_photo!.path));
+      final snapshot = await uploadTask.whenComplete(() => {});
+      return await snapshot.ref.getDownloadURL();
+    } catch (e) {
+      _showSnackBar('Error uploading photo: $e');
+      return null;
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _pickImage() async {
     final ImagePicker _picker = ImagePicker();
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-
     setState(() {
       _photo = image;
     });
@@ -126,7 +124,7 @@ class _AddWorkPageState extends State<AddWorkPage> {
       appBar: AppBar(
         title: const Text('Enter Work Details'),
         backgroundColor: Colors.grey[200],
-        elevation: 0, // Remove shadow for a flatter look
+        elevation: 0,
       ),
       body: Stack(
         children: [
@@ -137,36 +135,11 @@ class _AddWorkPageState extends State<AddWorkPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildPhotoField(), // Add photo field at the top
-                  _buildTextField(
-                    label: 'Work Title',
-                    onChanged: (value) => setState(() => _worktitle = value),
-                    validator: (value) =>
-                        value!.isEmpty ? 'Please enter the Work title' : null,
-                  ),
-                  _buildTextField(
-                    label: 'Work Order Number',
-                    onChanged: (value) => setState(() => _workOrderNumber = value),
-                    validator: (value) => value!.isEmpty
-                        ? 'Please enter the work order number'
-                        : null,
-                  ),
-                  _buildTextField(
-                    label: 'Purchase Order No.',
-                    maxLines: 1,
-                    onChanged: (value) =>
-                        setState(() => _purchaseordernumber = value),
-                    validator: (value) => value!.isEmpty
-                        ? 'Please enter the purchase order number'
-                        : null,
-                  ),
-                  _buildTextField(
-                    label: 'Customer Name',
-                    maxLines: 1,
-                    onChanged: (value) => setState(() => _customername = value),
-                    validator: (value) =>
-                        value!.isEmpty ? 'Please enter the customer name' : null,
-                  ),
+                  _buildPhotoField(),
+                  _buildTextField('Work Title', (value) => _worktitle = value),
+                  _buildTextField('Work Order Number', (value) => _workOrderNumber = value),
+                  _buildTextField('Purchase Order No.', (value) => _purchaseordernumber = value),
+                  _buildTextField('Customer Name', (value) => _customername = value),
                   _buildFocalPointFields(),
                   _buildAcplFocalPointFields(),
                   _buildPasswordField(),
@@ -192,8 +165,8 @@ class _AddWorkPageState extends State<AddWorkPage> {
               ),
             ),
           ),
-          if (_isLoading) // Display loading indicator if _isLoading is true
-            Center(
+          if (_isLoading)
+            const Center(
               child: CircularProgressIndicator(),
             ),
         ],
@@ -208,9 +181,9 @@ class _AddWorkPageState extends State<AddWorkPage> {
         onTap: _pickImage,
         child: Container(
           width: double.infinity,
-          height: 200, // Adjust the height to fit your design
+          height: 200,
           decoration: BoxDecoration(
-            color: Colors.grey[300],
+            color: Colors.white,
             borderRadius: BorderRadius.circular(12.0),
             border: Border.all(color: Colors.grey),
           ),
@@ -232,13 +205,7 @@ class _AddWorkPageState extends State<AddWorkPage> {
     );
   }
 
-  Widget _buildTextField({
-    required String label,
-    int maxLines = 1,
-    bool obscureText = false,
-    required ValueChanged<String> onChanged,
-    required FormFieldValidator<String> validator,
-  }) {
+  Widget _buildTextField(String label, ValueChanged<String> onChanged, {int maxLines = 1, bool obscureText = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Container(
@@ -250,7 +217,7 @@ class _AddWorkPageState extends State<AddWorkPage> {
               color: Colors.grey.withOpacity(0.3),
               spreadRadius: 2,
               blurRadius: 5,
-              offset: const Offset(0, 3), // changes position of shadow
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -258,17 +225,16 @@ class _AddWorkPageState extends State<AddWorkPage> {
           decoration: InputDecoration(
             labelText: label,
             labelStyle: TextStyle(
-              fontSize: 14, // Set font size to 14
+              fontSize: 14,
               color: Colors.grey[600],
             ),
-            border: InputBorder.none, // No border
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
           ),
           maxLines: maxLines,
           obscureText: obscureText,
           onChanged: onChanged,
-          validator: validator,
+          validator: (value) => value!.isEmpty ? 'Please enter the $label' : null,
         ),
       ),
     );
@@ -280,68 +246,11 @@ class _AddWorkPageState extends State<AddWorkPage> {
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3), // changes position of shadow
-                  ),
-                ],
-              ),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Focal Point Name',
-                  labelStyle: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                  border: InputBorder.none,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                ),
-                onChanged: (value) => setState(() => _focalpointName = value),
-                validator: (value) =>
-                    value!.isEmpty ? 'Please enter the focal point name' : null,
-              ),
-            ),
+            child: _buildTextField('Focal Point Name', (value) => _focalpointName = value),
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3), // changes position of shadow
-                  ),
-                ],
-              ),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Focal Point Number',
-                  labelStyle: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                  border: InputBorder.none,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                ),
-                onChanged: (value) => setState(() => _focalpointNumber = value),
-                validator: (value) => value!.isEmpty
-                    ? 'Please enter the focal point number'
-                    : null,
-              ),
-            ),
+            child: _buildTextField('Focal Point Number', (value) => _focalpointNumber = value),
           ),
         ],
       ),
@@ -354,69 +263,11 @@ class _AddWorkPageState extends State<AddWorkPage> {
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3), // changes position of shadow
-                  ),
-                ],
-              ),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'ACPL Focal Point Name',
-                  labelStyle: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                  border: InputBorder.none,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                ),
-                onChanged: (value) => setState(() => _acplfocalpointName = value),
-                validator: (value) => value!.isEmpty
-                    ? 'Please enter the ACPL focal point name'
-                    : null,
-              ),
-            ),
+            child: _buildTextField('ACPL Focal Point Name', (value) => _acplfocalpointName = value),
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3), // changes position of shadow
-                  ),
-                ],
-              ),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'ACPL Focal Point Number',
-                  labelStyle: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                  border: InputBorder.none,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                ),
-                onChanged: (value) => setState(() => _acplfocalpointNumber = value),
-                validator: (value) => value!.isEmpty
-                    ? 'Please enter the ACPL focal point number'
-                    : null,
-              ),
-            ),
+            child: _buildTextField('ACPL Focal Point Number', (value) => _acplfocalpointNumber = value),
           ),
         ],
       ),
@@ -435,26 +286,17 @@ class _AddWorkPageState extends State<AddWorkPage> {
               color: Colors.grey.withOpacity(0.3),
               spreadRadius: 2,
               blurRadius: 5,
-              offset: const Offset(0, 3), // changes position of shadow
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         child: TextFormField(
           controller: _passwordController,
-          obscureText: _obscurePassword,
           decoration: InputDecoration(
             labelText: 'Password',
-            labelStyle: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-            border: InputBorder.none,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             suffixIcon: IconButton(
               icon: Icon(
-                _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                color: Colors.grey[600],
+                _obscurePassword ? Icons.visibility_off : Icons.visibility,
               ),
               onPressed: () {
                 setState(() {
@@ -462,10 +304,12 @@ class _AddWorkPageState extends State<AddWorkPage> {
                 });
               },
             ),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
           ),
-          onChanged: (value) => setState(() => _password = value),
-          validator: (value) =>
-              value!.isEmpty ? 'Please enter the password' : null,
+          obscureText: _obscurePassword,
+          onChanged: (value) => _password = value,
+          validator: (value) => value!.isEmpty ? 'Please enter a password' : null,
         ),
       ),
     );

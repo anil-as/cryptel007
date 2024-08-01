@@ -38,7 +38,6 @@ class _HomePageState extends State<HomePage> {
     if (doc.exists) {
       final data = doc.data() as Map<String, dynamic>;
       if (password == data['PASSWORD']) {
-        // Clear the text fields before navigating to the new page
         _workOrderController.clear();
         _passwordController.clear();
 
@@ -98,8 +97,8 @@ class _HomePageState extends State<HomePage> {
               builder: (_, value, __) {
                 return AnimatedSwitcher(
                   duration: const Duration(milliseconds: 250),
-                  child: Icon(
-                    value.visible ? Icons.clear : Icons.menu,
+                  child: Image.asset(
+                    'assets/app-drawer.png',
                     color: AppColors.logoblue,
                     key: ValueKey<bool>(value.visible),
                   ),
@@ -107,20 +106,14 @@ class _HomePageState extends State<HomePage> {
               },
             ),
           ),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'CRYPTEL',
-                style: TextStyle(
-                  fontFamily: GoogleFonts.roboto().fontFamily,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                  color: AppColors.logoblue,
-                ),
-              ),
-             
-            ],
+          title: Text(
+            'CRYPTEL',
+            style: TextStyle(
+              fontFamily: GoogleFonts.roboto().fontFamily,
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+              color: AppColors.logoblue,
+            ),
           ),
         ),
         body: Center(
@@ -143,7 +136,6 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
                         width: double.infinity,
