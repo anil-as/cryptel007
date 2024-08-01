@@ -24,7 +24,7 @@ class _ManagePageState extends State<ManagePage> {
         title: const Text(
           'Manage',
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),

@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:cryptel007/Pages/Navigation%20Pages/home_page.dart';
 import 'package:cryptel007/Tools/bottom_nav.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:cryptel007/auth.dart';
@@ -54,7 +55,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         // Navigate to home page on successful sign-in
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const BottomNavPage()),
+          MaterialPageRoute(builder: (context) => const HomePage()),
         );
       } else {
         // Handle sign-in failure if needed

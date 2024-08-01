@@ -38,6 +38,10 @@ class _SettingsPageState extends State<SettingsPage> {
     _googleSignIn.signInSilently().then((GoogleSignInAccount? account) {
       if (account != null) {
         _fetchUserRole(account.email);
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
       }
     });
   }
@@ -50,12 +54,24 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _fetchUserRole(String? email) async {
     if (email == null) return;
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(email).get();
-    if (mounted) {
-      setState(() {
-        _userRole = userDoc['role'];
-        _isLoading = false;
-      });
+
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(email).get();
+      if (mounted) {
+        setState(() {
+          _userRole = userDoc['role'];
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching user role: $e')),
+      );
     }
   }
 
@@ -71,7 +87,6 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         title: const Text('Settings', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.grey[200],
         elevation: 0,
@@ -115,107 +130,106 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ),
                   ),
-                        const SizedBox(height: 20,),
-
-                 Expanded(
-  child: GridView.count(
-    crossAxisCount: 2, // Number of cards per row
-    childAspectRatio: 1.5, // Aspect ratio of each card
-    children: [
-      _buildCardTile(
-        icon: Icons.add,
-        title: 'Add Work',
-        color: AppColors.logoblue,
-        onTap: () {
-          if (_userRole == 'ADMIN' || _userRole == 'Manager' || _userRole == 'Editor') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AddWorkPage()),
-            );
-          } else {
-            _showAccessDeniedDialog();
-          }
-        },
-      ),
-      _buildCardTile(
-        icon: Icons.notifications,
-        title: 'Notifications',
-        color:AppColors.logoblue,
-        onTap: () {
-          // Handle Notifications tap
-        },
-      ),
-      _buildCardTile(
-        icon: Icons.security,
-        title: 'Control Hub',
-        color:AppColors.logoblue,
-        onTap: () {
-          if (_userRole == 'ADMIN') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AdminPage()),
-            );
-          } else {
-            _showAccessDeniedDialog();
-          }
-        },
-      ),
-      _buildCardTile(
-        icon: Icons.help,
-        title: 'Help & Support',
-        color:AppColors.logoblue,
-        onTap: () {
-          // Handle Help & Support tap
-        },
-      ),
-      _buildCardTile(
-        icon: Icons.info,
-        title: 'About',
-        color:AppColors.logoblue,
-        onTap: () {
-          // Handle About tap
-        },
-      ),
-      _buildCardTile(
-        icon: Icons.logout_rounded,
-        title: 'Logout',
-        color:AppColors.logoblue,
-        onTap: _showLogoutDialog,
-      ),
-    ],
-  ),
-)
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: GridView.count(
+                      crossAxisCount: 2, // Number of cards per row
+                      childAspectRatio: 1.5, // Aspect ratio of each card
+                      children: [
+                        _buildCardTile(
+                          icon: Icons.add,
+                          title: 'Add Work',
+                          color: AppColors.logoblue,
+                          onTap: () {
+                            if (_userRole == 'ADMIN' || _userRole == 'Manager' || _userRole == 'Editor') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const AddWorkPage()),
+                              );
+                            } else {
+                              _showAccessDeniedDialog();
+                            }
+                          },
+                        ),
+                        _buildCardTile(
+                          icon: Icons.notifications,
+                          title: 'Notifications',
+                          color: AppColors.logoblue,
+                          onTap: () {
+                            // Handle Notifications tap
+                          },
+                        ),
+                        _buildCardTile(
+                          icon: Icons.security,
+                          title: 'Control Hub',
+                          color: AppColors.logoblue,
+                          onTap: () {
+                            if (_userRole == 'ADMIN') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const AdminPage()),
+                              );
+                            } else {
+                              _showAccessDeniedDialog();
+                            }
+                          },
+                        ),
+                        _buildCardTile(
+                          icon: Icons.help,
+                          title: 'Help & Support',
+                          color: AppColors.logoblue,
+                          onTap: () {
+                            // Handle Help & Support tap
+                          },
+                        ),
+                        _buildCardTile(
+                          icon: Icons.info,
+                          title: 'About',
+                          color: AppColors.logoblue,
+                          onTap: () {
+                            // Handle About tap
+                          },
+                        ),
+                        _buildCardTile(
+                          icon: Icons.logout_rounded,
+                          title: 'Logout',
+                          color: AppColors.logoblue,
+                          onTap: _showLogoutDialog,
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
     );
   }
-Widget _buildCardTile({
-  required IconData icon,
-  required String title,
-  required Color color,
-  required VoidCallback onTap,
-}) {
-  return Card(
-    elevation: 5,
-    color: color, // Use the provided color for the card
-    child: InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: Colors.white), // Use white color for the icon
-            const SizedBox(height: 16),
-            Text(title, style: const TextStyle(fontSize: 16, color: Colors.white)), // Use white color for the text
-          ],
+
+  Widget _buildCardTile({
+    required IconData icon,
+    required String title,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 5,
+      color: color, // Use the provided color for the card
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 40, color: Colors.white), // Use white color for the icon
+              const SizedBox(height: 16),
+              Text(title, style: const TextStyle(fontSize: 16, color: Colors.white)), // Use white color for the text
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
- 
+    );
+  }
 
   void _showLogoutDialog() {
     showDialog(
