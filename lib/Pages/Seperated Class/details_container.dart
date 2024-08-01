@@ -41,9 +41,9 @@ class DetailsContainer extends StatelessWidget {
           const Divider(),
           _buildDetailRow('Customer Name', data['CUSTOMERNAME']),
           const Divider(),
-          _buildContactDetail('Focal Point Name', data['FOCALPOINTNAME'], data['FOCALPOINTNUMBER']),
+          _buildContactDetail('Focal Point', data['FOCALPOINTNAME'], data['FOCALPOINTNUMBER']),
           const Divider(),
-          _buildContactDetail('ACPL Focal Point Name', data['ACPLFOCALPOINTNAME'], data['ACPLFOCALPOINTNUMBER']),
+          _buildContactDetail('ACPL Focal Point', data['ACPLFOCALPOINTNAME'], data['ACPLFOCALPOINTNUMBER']),
           // Creation Date and Edited Date removed
         ],
       ),
