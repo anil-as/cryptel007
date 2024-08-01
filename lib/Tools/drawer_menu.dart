@@ -1,10 +1,14 @@
+// lib/pages/navigation_pages/drawer_menu.dart
+
 import 'package:cryptel007/Pages/Core%20Pages/add_work_page.dart';
+import 'package:cryptel007/Pages/Core%20Pages/login_page.dart';
 import 'package:cryptel007/Pages/Navigation%20Pages/settings_page.dart';
+import 'package:cryptel007/Pages/Sub%20Pages/admin_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
+import 'package:cryptel007/Tools/user_role_service.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DrawerMenu extends StatefulWidget {
   const DrawerMenu({super.key});
@@ -15,9 +19,9 @@ class DrawerMenu extends StatefulWidget {
 
 class _DrawerMenuState extends State<DrawerMenu> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final UserRoleService _userRoleService = UserRoleService();
   GoogleSignInAccount? _currentUser;
   String? _userRole;
-  bool _isProfileExpanded = false;
   bool _isLoading = true;
 
   @override
@@ -33,26 +37,24 @@ class _DrawerMenuState extends State<DrawerMenu> {
     _googleSignIn.signInSilently();
   }
 
+  Future<void> logout() async {
+    await _googleSignIn.signOut();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+    );
+  }
+
   Future<void> _fetchUserRole(String? email) async {
     if (email == null) return;
 
-    try {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(email).get();
-      if (mounted) {
-        setState(() {
-          _userRole = userDoc['role'];
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching user role: $e')),
-      );
+    final role = await _userRoleService.fetchUserRole(email);
+
+    if (mounted) {
+      setState(() {
+        _userRole = role;
+        _isLoading = false;
+      });
     }
   }
 
@@ -78,6 +80,48 @@ class _DrawerMenuState extends State<DrawerMenu> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Logout',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          content: const Text(
+            'Are you sure you want to logout?',
+            style: TextStyle(fontSize: 16),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              onPressed: logout,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.logoblue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text(
+                'Logout',
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
             ),
           ],
         );
@@ -154,7 +198,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                 if (_userRole == 'ADMIN' || _userRole == 'Manager' || _userRole == 'Editor') {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const AddWorkPage()), // Ensure AddWorkPage is defined
+                    MaterialPageRoute(builder: (context) => const AddWorkPage()),
                   );
                 } else {
                   _showAccessDeniedDialog();
@@ -168,7 +212,16 @@ class _DrawerMenuState extends State<DrawerMenu> {
               ),
             ),
             ListTile(
-              onTap: () {},
+              onTap: () {
+                if (_userRole == 'ADMIN') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AdminPage()),
+                  );
+                } else {
+                  _showAccessDeniedDialog();
+                }
+              },
               leading: const FaIcon(FontAwesomeIcons.gears),
               title: const Text('Admin'),
             ),
@@ -183,7 +236,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
               title: const Text('Saved'),
             ),
             ListTile(
-              onTap: () {},
+              onTap: _showLogoutDialog,
               leading: const FaIcon(FontAwesomeIcons.rightFromBracket),
               title: const Text('Logout'),
             ),

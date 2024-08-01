@@ -1,284 +1,155 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cryptel007/Pages/Navigation%20Pages/home_page.dart';
+import 'package:cryptel007/Pages/Seperated%20Class/details_container.dart';
+import 'package:cryptel007/Pages/Seperated%20Class/work_header.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:cryptel007/Tools/custom_button.dart';
+import 'package:cryptel007/Tools/user_role_service.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:percent_indicator/percent_indicator.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
-class WorkDetailPage extends StatelessWidget {
+class WorkDetailPage extends StatefulWidget {
   final String workOrderNumber;
 
   const WorkDetailPage({super.key, required this.workOrderNumber});
 
   @override
+  _WorkDetailPageState createState() => _WorkDetailPageState();
+}
+
+class _WorkDetailPageState extends State<WorkDetailPage> {
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final UserRoleService _userRoleService = UserRoleService();
+  GoogleSignInAccount? _currentUser;
+  String? _userRole;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) {
+      setState(() {
+        _currentUser = account;
+        _isLoading = true;
+      });
+      _fetchUserRole(account?.email);
+    });
+    _googleSignIn.signInSilently();
+  }
+
+  Future<void> _fetchUserRole(String? email) async {
+    if (email == null) return;
+
+    final role = await _userRoleService.fetchUserRole(email);
+
+    if (mounted) {
+      setState(() {
+        _userRole = role;
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final textScaleFactor = mediaQuery.textScaleFactor;
+
     return Scaffold(
       appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 10.0),
-          child: IconButton(
-            icon: Image.asset('assets/arrow.png'),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            iconSize: 7,
-          ),
+        title: Text(
+          'Work Details',
+          style: TextStyle(fontSize: 20 * textScaleFactor),
+        ),
+        leading: IconButton(
+          icon: Image.asset('assets/arrow.png'),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
+          },
         ),
         actions: [
+          if (_userRole == 'ADMIN' ||
+              _userRole == 'Manager' ||
+              _userRole == 'Editor')
+            CustomButton(
+              text: 'Edit',
+              onPressed: () {
+                // Handle edit action
+              },
+              h: 37,
+              w: 37,
+              buttonColor: Colors.white,
+              textColor: AppColors.logoblue,
+              suffixIcon: Icons.edit_square,
+              iconColor: AppColors.logoblue,
+            ),
+          const SizedBox(width: 17),
           IconButton(
-            icon: const Icon(
-              Icons.settings_suggest_sharp, // Settings icon
-              color: Colors.black,
-              size: 34, // Adjust the size as needed
-            ),
+            icon: Image.asset('assets/bookmark.png'),
             onPressed: () {
-              // Add your onPressed logic here
+              // Handle bookmark action
             },
-          )
-        ],
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
-        elevation: 0,
-      ),
-      body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('work')
-            .doc(workOrderNumber)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation(Colors.blue),
-              ),
-            );
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Error: ${snapshot.error}',
-                style: const TextStyle(fontSize: 16, color: Colors.red),
-              ),
-            );
-          }
-
-          if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(
-              child: Text(
-                'No data found',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            );
-          }
-
-          final workData = snapshot.data!.data() as Map<String, dynamic>?;
-
-          if (workData == null) {
-            return const Center(
-              child: Text(
-                'No data found',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            );
-          }
-
-          final double percentage = workData['percentage'] != null
-              ? workData['percentage'] / 100.0
-              : 0.5;
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTitleCard(
-                  Subtitle: workData['creationDate'] != null
-                      ? DateFormat('yyyy-MM-dd – hh:mm').format(
-                          (workData['creationDate'] as Timestamp).toDate(),
-                        )
-                      : 'N/A',
-                  title: 'Work Title',
-                  content: workData['WorkTitle'] ?? 'N/A',
-                  icon: Icons.title,
-                  percentage: percentage,
-                ),
-                const SizedBox(height: 20),
-                _buildInfoCard(
-                  content: (workData['WorkDescription'] ?? 'N/A').toUpperCase(),
-                  title: 'Description',
-                ),
-                const SizedBox(height: 20),
-                _buildInfoCard(
-                  title: 'Work Order No',
-                  content: workOrderNumber,
-                ),
-                const SizedBox(height: 20),
-                _buildContactInfo(
-                  contacts: workData['contacts'] as List<dynamic>? ?? [],
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child:CustomButton(text: 'Go to Jobcard', onPressed: (){})
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child:CustomButton(text: 'Go to Drawings', onPressed: (){})
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildTitleCard({
-    required String title,
-    required String content,
-    required String Subtitle,
-    required IconData icon,
-    required double percentage,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey[200]!,
-            blurRadius: 10,
-            spreadRadius: 2,
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Image.asset(
-            'assets/work.png',
-            width: 70,
-            height: 70,
-          ),
-          const SizedBox(width: 37),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  Subtitle,
-                  style: GoogleFonts.strait(fontSize: 17, color: Colors.black),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  content.toUpperCase(),
-                  style: GoogleFonts.strait(fontSize: 27, color: Colors.black),
-                ),
-              ],
-            ),
-          ),
-          CircularPercentIndicator(
-            radius: 40.0,
-            lineWidth: 8.0,
-            percent: percentage,
-            center: Text(
-              '${(percentage * 100).toStringAsFixed(1)}%',
-              style: GoogleFonts.dmSans(
-                fontSize: 14,
-                color: Colors.black,
-              ),
-            ),
-            progressColor: Colors.blue,
-          ),
-        ],
-      ),
-    );
-  }
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: StreamBuilder<DocumentSnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('works')
+                        .doc(widget.workOrderNumber)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-  Widget _buildInfoCard({
-    String? title,
-    required String content,
-    IconData? icon,
-    bool showTitle = true,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey[200]!,
-            blurRadius: 10,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (icon != null)
-            Icon(icon, color: AppColors.logoblue, size: 30),
-          if (icon != null) const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (showTitle && title != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: Text(
-                      title,
-                      style: GoogleFonts.dmSans(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.logoblue,
-                      ),
-                    ),
-                  ),
-                Text(
-                  content,
-                  style: GoogleFonts.dmSans(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                      if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      }
+
+                      if (!snapshot.hasData || !snapshot.data!.exists) {
+                        return const Center(
+                            child:
+                                Text('No details found for this work order.'));
+                      }
+
+                      final data =
+                          snapshot.data!.data() as Map<String, dynamic>;
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          WorkHeader(
+                            workTitle: data['WORKTITLE'],
+                            workPhoto: data['PHOTO'],
+                            cdate: data['CDATE'],
+                            customerName: data['CUSTOMERNAME'],
+                            screenWidth: screenWidth,
+                            textScaleFactor: textScaleFactor,
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(screenWidth * 0.04),
+                            child: DetailsContainer(
+                              data: data,
+                              screenWidth: screenWidth,
+                              textScaleFactor: textScaleFactor,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContactInfo({required List<dynamic> contacts}) {
-    if (contacts.isEmpty) {
-      return _buildInfoCard(
-        title: 'Contact Info',
-        content: 'No contacts available',
-        icon: Icons.contact_phone,
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: contacts.map((contact) {
-        final contactMap = contact as Map<String, dynamic>;
-        return _buildInfoCard(
-          title: 'Contact Info',
-          content:
-              'Name: ${contactMap['name']}\nNumber: ${contactMap['number']}',
-          icon: Icons.contact_phone,
-        );
-      }).toList(),
     );
   }
 }

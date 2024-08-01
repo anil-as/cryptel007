@@ -32,12 +32,12 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-    final docRef = _firestore.collection('work').doc(workOrderNumber);
+    final docRef = _firestore.collection('works').doc(workOrderNumber);
     final doc = await docRef.get();
 
     if (doc.exists) {
       final data = doc.data() as Map<String, dynamic>;
-      if (password == data['password']) {
+      if (password == data['PASSWORD']) {
         // Clear the text fields before navigating to the new page
         _workOrderController.clear();
         _passwordController.clear();
