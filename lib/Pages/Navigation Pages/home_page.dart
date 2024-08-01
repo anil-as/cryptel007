@@ -86,8 +86,10 @@ class _HomePageState extends State<HomePage> {
       ),
       drawer: const DrawerMenu(),
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.grey[200],
+          elevation: 0,
+          backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
           leading: IconButton(
             onPressed: _handleMenuButtonPressed,
@@ -117,10 +119,7 @@ class _HomePageState extends State<HomePage> {
                   color: AppColors.logoblue,
                 ),
               ),
-              Image.asset(
-                'assets/logobluer.png',
-                height: 30,
-              ),
+             
             ],
           ),
         ),
