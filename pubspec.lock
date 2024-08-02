@@ -153,6 +153,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
+  custom_cupertino_picker:
+    dependency: "direct main"
+    description:
+      name: custom_cupertino_picker
+      sha256: af5e28e0cba5e3421867f99467a3a53a353d128855ec0141b02dea5ac514a4c1
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.3"
   fake_async:
     dependency: transitive
     description:
@@ -741,6 +749,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  syncfusion_flutter_core:
+    dependency: transitive
+    description:
+      name: syncfusion_flutter_core
+      sha256: fd4d2cdbf8d0d1e3441817cb8a03f896566fad5187788957e78492fe16800388
+      url: "https://pub.dev"
+    source: hosted
+    version: "26.2.7"
+  syncfusion_flutter_gauges:
+    dependency: "direct main"
+    description:
+      name: syncfusion_flutter_gauges
+      sha256: "009f85edcb59dac20f1c5b445170de74eb65be774c6fdd4f8dc7bbc00e261f32"
+      url: "https://pub.dev"
+    source: hosted
+    version: "26.2.7"
   term_glyph:
     dependency: transitive
     description:

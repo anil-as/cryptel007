@@ -64,7 +64,6 @@ class _AddWorkPageState extends State<AddWorkPage> {
       'ACPLFOCALPOINTNAME': _acplfocalpointName,
       'ACPLFOCALPOINTNUMBER': _acplfocalpointNumber,
       'PASSWORD': _password,
-      'EDITEDDATE': _creationDate,
       'PHOTO': photoUrl,
     };
 
@@ -76,12 +75,11 @@ class _AddWorkPageState extends State<AddWorkPage> {
 
       _showSnackBar('Data successfully saved');
       Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (context) => SpecificWorkPage(workOrderNumber: _workOrderNumber),
-  ),
-);
-
+        context,
+        MaterialPageRoute(
+          builder: (context) => WorkDetailPage(workOrderNumber: _workOrderNumber),
+        ),
+      );
     } catch (e) {
       _showSnackBar('Error saving data: $e');
     } finally {
@@ -111,8 +109,8 @@ class _AddWorkPageState extends State<AddWorkPage> {
   }
 
   Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     setState(() {
       _photo = image;
     });
@@ -122,10 +120,17 @@ class _AddWorkPageState extends State<AddWorkPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Enter Work Details'),
-        backgroundColor: Colors.grey[200],
-        elevation: 0,
-      ),
+  title: const Text('Enter Work Details'),
+  backgroundColor: Colors.grey[200],
+  elevation: 0,
+  leading: IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () {
+      Navigator.pushReplacementNamed(context, '/home'); // Replace '/home' with your route name for HomePage
+    },
+  ),
+),
+
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -205,7 +210,13 @@ class _AddWorkPageState extends State<AddWorkPage> {
     );
   }
 
-  Widget _buildTextField(String label, ValueChanged<String> onChanged, {int maxLines = 1, bool obscureText = false}) {
+  Widget _buildTextField(
+    String label,
+    ValueChanged<String> onChanged, {
+    int maxLines = 1,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text, // Default to text input
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Container(
@@ -234,6 +245,7 @@ class _AddWorkPageState extends State<AddWorkPage> {
           maxLines: maxLines,
           obscureText: obscureText,
           onChanged: onChanged,
+          keyboardType: keyboardType, // Apply keyboard type
           validator: (value) => value!.isEmpty ? 'Please enter the $label' : null,
         ),
       ),
@@ -246,11 +258,18 @@ class _AddWorkPageState extends State<AddWorkPage> {
       child: Row(
         children: [
           Expanded(
-            child: _buildTextField('Focal Point Name', (value) => _focalpointName = value),
+            child: _buildTextField(
+              'Focal Point Name',
+              (value) => _focalpointName = value,
+            ),
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: _buildTextField('Focal Point Number', (value) => _focalpointNumber = value),
+            child: _buildTextField(
+              'Focal Point Number',
+              (value) => _focalpointNumber = value,
+              keyboardType: TextInputType.number, // Set keyboard type to number
+            ),
           ),
         ],
       ),
@@ -263,11 +282,18 @@ class _AddWorkPageState extends State<AddWorkPage> {
       child: Row(
         children: [
           Expanded(
-            child: _buildTextField('ACPL Focal Point Name', (value) => _acplfocalpointName = value),
+            child: _buildTextField(
+              'ACPL Focal Point Name',
+              (value) => _acplfocalpointName = value,
+            ),
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: _buildTextField('ACPL Focal Point Number', (value) => _acplfocalpointNumber = value),
+            child: _buildTextField(
+              'ACPL Focal Point Number',
+              (value) => _acplfocalpointNumber = value,
+              keyboardType: TextInputType.number, // Set keyboard type to number
+            ),
           ),
         ],
       ),
@@ -294,9 +320,15 @@ class _AddWorkPageState extends State<AddWorkPage> {
           controller: _passwordController,
           decoration: InputDecoration(
             labelText: 'Password',
+            labelStyle: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[600],
+            ),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             suffixIcon: IconButton(
               icon: Icon(
-                _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                _obscurePassword ? Icons.visibility : Icons.visibility_off,
               ),
               onPressed: () {
                 setState(() {
@@ -304,8 +336,6 @@ class _AddWorkPageState extends State<AddWorkPage> {
                 });
               },
             ),
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
           ),
           obscureText: _obscurePassword,
           onChanged: (value) => _password = value,

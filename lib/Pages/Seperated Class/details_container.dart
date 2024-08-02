@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart'; // Import this for making phone calls
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailsContainer extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -146,7 +146,13 @@ class DetailsContainer extends StatelessWidget {
         scheme: 'tel',
         path: number,
       );
-      await launchUrl(launchUri);
+      try {
+        await launchUrl(launchUri, mode: LaunchMode.externalApplication);
+      } catch (e) {
+        print('Error launching URL: $e');
+      }
+    } else {
+      print('No phone number provided or it is empty');
     }
   }
 }

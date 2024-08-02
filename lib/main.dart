@@ -1,3 +1,4 @@
+import 'package:cryptel007/Pages/Navigation%20Pages/home_page.dart';
 import 'package:cryptel007/firebase_options.dart';
 import 'package:cryptel007/main_page.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -15,9 +16,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return  MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainPage(),
+      home: const MainPage(),
+      routes: {
+    '/home': (context) => const HomePage(),
+    // Other routes
+  },
     );
   }
 }
