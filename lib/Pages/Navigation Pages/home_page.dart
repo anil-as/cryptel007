@@ -1,11 +1,12 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cryptel007/Pages/Core%20Pages/work_detail_page.dart';
+import 'package:cryptel007/Pages/Widgets/carousel_widget.dart';
+import 'package:cryptel007/Pages/Widgets/company_description.dart'; // Import the new widget
+import 'package:cryptel007/Pages/Widgets/custom_app_bar.dart';
+import 'package:cryptel007/Pages/Widgets/work_search_form.dart';
 import 'package:cryptel007/Tools/colors.dart';
-import 'package:cryptel007/Tools/custom_button.dart';
 import 'package:cryptel007/Tools/drawer_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 
 class HomePage extends StatefulWidget {
@@ -28,7 +29,9 @@ class _HomePageState extends State<HomePage> {
     'assets/3axiscnc.png',
     'assets/cnc200.png',
     'assets/cnclathee.png',
-    'assets/cncmac.png',
+    'assets/cnccmm.png',
+    'assets/JBM.png',
+    'assets/Con MM.png'
   ];
 
   Future<void> _login() async {
@@ -97,109 +100,31 @@ class _HomePageState extends State<HomePage> {
       drawer: const DrawerMenu(),
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          automaticallyImplyLeading: false,
-          leading: IconButton(
-            onPressed: _handleMenuButtonPressed,
-            icon: ValueListenableBuilder<AdvancedDrawerValue>(
-              valueListenable: _advancedDrawerController,
-              builder: (_, value, __) {
-                return AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
-                  child: Image.asset(
-                    'assets/app-drawer.png',
-                    color: AppColors.logoblue,
-                    key: ValueKey<bool>(value.visible),
-                  ),
-                );
-              },
-            ),
-          ),
-          title: Text(
-            'CRYPTEL',
-            style: TextStyle(
-              fontFamily: GoogleFonts.roboto().fontFamily,
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-              color: AppColors.logoblue,
-            ),
-          ),
+        appBar: CustomAppBar(
+          advancedDrawerController: _advancedDrawerController,
+          onMenuButtonPressed: _handleMenuButtonPressed,
         ),
         body: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CarouselSlider(
-  options: CarouselOptions(
-    height: 200.0,
-    autoPlay: true,
-    autoPlayInterval: const Duration(seconds: 3),
-    autoPlayAnimationDuration: const Duration(milliseconds: 800),
-    autoPlayCurve: Curves.fastOutSlowIn,
-    pauseAutoPlayOnTouch: true,
-    aspectRatio: 2.0,
-    onPageChanged: (index, reason) {
-      setState(() {
-        _current = index;
-      });
-    },
-  ),
-  items: imgList.map((item) {
-    return Builder(
-      builder: (BuildContext context) {
-        return Container(
-          width: MediaQuery.of(context).size.width,
-          margin: const EdgeInsets.symmetric(horizontal: 5.0),
-          decoration: BoxDecoration(
-            color: Colors.white, // Background color inside the border
-            borderRadius: BorderRadius.circular(12.0), // Increased border radius
-            border: Border.all(
-              color: AppColors.logoblue, // Border color
-              width: 3.0, // Border width
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3), // Shadow color
-                offset: const Offset(0, 4), // Shadow offset
-                blurRadius: 6, // Shadow blur radius
-              ),
-            ],
-            image: DecorationImage(
-              image: AssetImage(item),
-              fit: BoxFit.fitHeight, // Adjust fit as needed
-            ),
-          ),
-        );
-      },
-    );
-  }).toList(),
-),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: imgList.map((url) {
-                    int index = imgList.indexOf(url);
-                    return Container(
-                      width: 8.0,
-                      height: 8.0,
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 2.0),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color:
-                            _current == index ? Colors.blueAccent : Colors.grey,
-                      ),
-                    );
-                  }).toList(),
+                const CompanyDescription(), 
+                const SizedBox(height: 10),
+                CarouselWidget(
+                  imgList: imgList,
+                  currentIndex: _current,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _current = index;
+                    });
+                  },
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                      EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.width * 0.04, horizontal: MediaQuery.of(context).size.width * 0.04),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -211,90 +136,16 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   ),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black26,
-                              offset: Offset(0, 4),
-                              blurRadius: 4,
-                            ),
-                          ],
-                        ),
-                        child: TextField(
-                          controller: _workOrderController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            labelText: 'Work Order No.',
-                            labelStyle: TextStyle(
-                              fontFamily: GoogleFonts.habibi().fontFamily,
-                              color: AppColors.logoblue,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black26,
-                              offset: Offset(0, 4),
-                              blurRadius: 4,
-                            ),
-                          ],
-                        ),
-                        child: TextField(
-                          controller: _passwordController,
-                          obscureText: !_isPasswordVisible,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            labelText: 'Password',
-                            labelStyle: TextStyle(
-                              color: AppColors.logoblue,
-                              fontSize: 18,
-                              fontFamily: GoogleFonts.habibi().fontFamily,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _isPasswordVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                                color: AppColors.logoblue,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _isPasswordVisible = !_isPasswordVisible;
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 17),
-                      CustomButton(
-                        buttonColor: AppColors.logoblue,
-                        text: 'Enter',
-                        onPressed: _login,
-                        borderRadius: 12,
-                        suffixIcon: Icons.arrow_right,
-                      ),
-                    ],
+                  child: WorkForm(
+                    workOrderController: _workOrderController,
+                    passwordController: _passwordController,
+                    isPasswordVisible: _isPasswordVisible,
+                    onPasswordVisibilityToggle: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                    onLogin: _login,
                   ),
                 ),
               ],

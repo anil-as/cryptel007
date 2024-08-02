@@ -103,7 +103,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               FadeTransition(
                 opacity: _animation,
                 child: Text(
-                  'CRYO PRECISION TECHNOLOGIES',
+                  'CRYO PRECISION TECHNOLOGIES PVT LTD',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
