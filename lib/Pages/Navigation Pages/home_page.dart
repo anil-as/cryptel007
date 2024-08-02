@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cryptel007/Pages/Core%20Pages/work_detail_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
@@ -20,6 +21,15 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
   final _advancedDrawerController = AdvancedDrawerController();
+  int _current = 0;
+
+  final List<String> imgList = [
+    'assets/4axis.png',
+    'assets/3axiscnc.png',
+    'assets/cnc200.png',
+    'assets/cnclathee.png',
+    'assets/cncmac.png',
+  ];
 
   Future<void> _login() async {
     final workOrderNumber = _workOrderController.text;
@@ -51,7 +61,8 @@ class _HomePageState extends State<HomePage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid work order number or password')),
+          const SnackBar(
+              content: Text('Invalid work order number or password')),
         );
       }
     } else {
@@ -122,8 +133,73 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                CarouselSlider(
+  options: CarouselOptions(
+    height: 200.0,
+    autoPlay: true,
+    autoPlayInterval: const Duration(seconds: 3),
+    autoPlayAnimationDuration: const Duration(milliseconds: 800),
+    autoPlayCurve: Curves.fastOutSlowIn,
+    pauseAutoPlayOnTouch: true,
+    aspectRatio: 2.0,
+    onPageChanged: (index, reason) {
+      setState(() {
+        _current = index;
+      });
+    },
+  ),
+  items: imgList.map((item) {
+    return Builder(
+      builder: (BuildContext context) {
+        return Container(
+          width: MediaQuery.of(context).size.width,
+          margin: const EdgeInsets.symmetric(horizontal: 5.0),
+          decoration: BoxDecoration(
+            color: Colors.white, // Background color inside the border
+            borderRadius: BorderRadius.circular(12.0), // Increased border radius
+            border: Border.all(
+              color: AppColors.logoblue, // Border color
+              width: 3.0, // Border width
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3), // Shadow color
+                offset: const Offset(0, 4), // Shadow offset
+                blurRadius: 6, // Shadow blur radius
+              ),
+            ],
+            image: DecorationImage(
+              image: AssetImage(item),
+              fit: BoxFit.fitHeight, // Adjust fit as needed
+            ),
+          ),
+        );
+      },
+    );
+  }).toList(),
+),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: imgList.map((url) {
+                    int index = imgList.indexOf(url);
+                    return Container(
+                      width: 8.0,
+                      height: 8.0,
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 2.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color:
+                            _current == index ? Colors.blueAccent : Colors.grey,
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 20),
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -139,7 +215,8 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 16),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
@@ -168,7 +245,8 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(height: 20),
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 16),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
