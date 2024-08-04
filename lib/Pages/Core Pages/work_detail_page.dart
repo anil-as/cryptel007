@@ -21,7 +21,6 @@ class WorkDetailPage extends StatefulWidget {
 class _WorkDetailPageState extends State<WorkDetailPage> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final UserRoleService _userRoleService = UserRoleService();
-  GoogleSignInAccount? _currentUser;
   String? _userRole;
   bool _isLoading = true;
 
@@ -30,7 +29,6 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
     super.initState();
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) {
       setState(() {
-        _currentUser = account;
         _isLoading = true;
       });
       _fetchUserRole(account?.email);
@@ -73,16 +71,6 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
           },
         ),
         actions: [
-            if (_userRole == 'ADMIN' ||
-              _userRole == 'Manager' ||
-              _userRole == 'Editor')
-            IconButton(
-            icon: Image.asset('assets/edit.png'),
-            onPressed: () {
-              // Handle bookmark action
-            },
-          ),
-          const SizedBox(width: 7),
           IconButton(
             icon: Image.asset('assets/bookmark.png'),
             onPressed: () {
@@ -136,43 +124,46 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                               data: data,
                               screenWidth: screenWidth,
                               textScaleFactor: textScaleFactor,
+                              userRole: _userRole.toString(),
                             ),
                           ),
-                         
-                            Padding(
-                              padding: EdgeInsets.all(screenWidth * 0.04),
-                              child: Column(
-                                children: [
-                                  CustomButton(
-                                    text: 'Work Status',
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                 SpecificWorkPage(workOrderNumber: data['WONUMBER'] ,)),
-                                      );
-                                    },
-                                    h: 47,
-                                    w: double.infinity,
-                                    buttonColor: Colors.yellow,
-                                    textColor: Colors.black,
-                                  ),
-                                  SizedBox(height: screenWidth * 0.02),
-                                  CustomButton(
-                                    text: 'Certification',
-                                    onPressed: () {
-                                      // Handle button 2 action
-                                    },
-                                    h: 47,
-                                    w: double.infinity,
-                                    buttonColor: AppColors.lightblue,
-                                    textColor: Colors.black,
-                                  ),
-                                  SizedBox(height: screenWidth * 0.02),
-                                   if (_userRole == 'ADMIN' ||
-                              _userRole == 'Manager' ||
-                              _userRole == 'Editor')
+                          Padding(
+                            padding: EdgeInsets.all(screenWidth * 0.04),
+                            child: Column(
+                              children: [
+                                CustomButton(
+                                  text: 'Work Status',
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              SpecificWorkPage(
+                                                workOrderNumber:
+                                                    data['WONUMBER'],
+                                              )),
+                                    );
+                                  },
+                                  h: 47,
+                                  w: double.infinity,
+                                  buttonColor: Colors.yellow,
+                                  textColor: Colors.black,
+                                ),
+                                SizedBox(height: screenWidth * 0.02),
+                                CustomButton(
+                                  text: 'Certification',
+                                  onPressed: () {
+                                    // Handle button 2 action
+                                  },
+                                  h: 47,
+                                  w: double.infinity,
+                                  buttonColor: AppColors.lightblue,
+                                  textColor: Colors.black,
+                                ),
+                                SizedBox(height: screenWidth * 0.02),
+                                if (_userRole == 'ADMIN' ||
+                                    _userRole == 'Manager' ||
+                                    _userRole == 'Editor')
                                   CustomButton(
                                     text: 'Button 3',
                                     onPressed: () {
@@ -183,10 +174,10 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                     buttonColor: AppColors.logoblue,
                                     textColor: Colors.white,
                                   ),
-                                  SizedBox(height: screenWidth * 0.02),
-                                   if (_userRole == 'ADMIN' ||
-                              _userRole == 'Manager' ||
-                              _userRole == 'Editor')
+                                SizedBox(height: screenWidth * 0.02),
+                                if (_userRole == 'ADMIN' ||
+                                    _userRole == 'Manager' ||
+                                    _userRole == 'Editor')
                                   CustomButton(
                                     text: 'Button 4',
                                     onPressed: () {
@@ -197,9 +188,9 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                     buttonColor: AppColors.logoblue,
                                     textColor: Colors.white,
                                   ),
-                                ],
-                              ),
+                              ],
                             ),
+                          ),
                         ],
                       );
                     },

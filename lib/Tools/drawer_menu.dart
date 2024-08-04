@@ -181,6 +181,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                           style: const TextStyle(fontSize: 16, color: Colors.grey),
                         ),
                         const SizedBox(height: 4),
+                        if(_userRole != 'USER')
                         _isLoading
                           ? const CircularProgressIndicator()
                           : Text(

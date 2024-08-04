@@ -8,10 +8,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onMenuButtonPressed;
 
   const CustomAppBar({
-    Key? key,
+    super.key,
     required this.advancedDrawerController,
     required this.onMenuButtonPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

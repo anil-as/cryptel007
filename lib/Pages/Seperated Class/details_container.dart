@@ -5,12 +5,14 @@ class DetailsContainer extends StatelessWidget {
   final Map<String, dynamic> data;
   final double screenWidth;
   final double textScaleFactor;
+  final String userRole; // Added userRole as a parameter
 
   const DetailsContainer({
     super.key,
     required this.data,
     required this.screenWidth,
     required this.textScaleFactor,
+    required this.userRole, // Added userRole as a parameter
   });
 
   @override
@@ -39,10 +41,11 @@ class DetailsContainer extends StatelessWidget {
           const Divider(),
           _buildDetailRow('Customer Name', data['CUSTOMERNAME']),
           const Divider(),
-          _buildContactDetail('Focal Point', data['FOCALPOINTNAME'], data['FOCALPOINTNUMBER']),
+          _buildContactDetail(
+              'Focal Point', data['FOCALPOINTNAME'], data['FOCALPOINTNUMBER']),
           const Divider(),
-          _buildContactDetail('ACPL Focal Point', data['ACPLFOCALPOINTNAME'], data['ACPLFOCALPOINTNUMBER']),
-          // Creation Date and Edited Date removed
+          _buildContactDetail('ACPL Focal Point', data['ACPLFOCALPOINTNAME'],
+              data['ACPLFOCALPOINTNUMBER']),
         ],
       ),
     );
@@ -102,7 +105,7 @@ class DetailsContainer extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (name != null && name.isNotEmpty) 
+                if (name != null && name.isNotEmpty)
                   Text(
                     name,
                     style: TextStyle(
@@ -110,18 +113,18 @@ class DetailsContainer extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                if (number != null && number.isNotEmpty) 
+                if (number != null && number.isNotEmpty)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Text(
                         number,
                         style: TextStyle(
                           fontSize: 18 * textScaleFactor, // Adjusted font size
                         ),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       IconButton(
                         icon: Icon(
                           Icons.call,
