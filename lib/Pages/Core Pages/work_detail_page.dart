@@ -111,6 +111,8 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           WorkHeader(
+                            workOrderNumber: data['WONUMBER'],
+                             data: data,
                             workTitle: data['WORKTITLE'],
                             workPhoto: data['PHOTO'],
                             cdate: data['CDATE'],
@@ -124,11 +126,11 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                               data: data,
                               screenWidth: screenWidth,
                               textScaleFactor: textScaleFactor,
-                              userRole: _userRole.toString(),
+                              userRole: _userRole.toString(), workOrderNumber: data['WONUMBER'],
                             ),
                           ),
                           Padding(
-                            padding: EdgeInsets.all(screenWidth * 0.04),
+                            padding: EdgeInsets.symmetric(horizontal:  screenWidth * 0.04),
                             child: Column(
                               children: [
                                 CustomButton(

@@ -5,49 +5,54 @@ class DetailsContainer extends StatelessWidget {
   final Map<String, dynamic> data;
   final double screenWidth;
   final double textScaleFactor;
-  final String userRole; 
+  final String userRole;
+  final String workOrderNumber;
 
   const DetailsContainer({
     super.key,
     required this.data,
     required this.screenWidth,
     required this.textScaleFactor,
-    required this.userRole, 
+    required this.userRole,
+    required this.workOrderNumber,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(screenWidth * 0.04),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+    return Stack(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(screenWidth * 0.04),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildDetailRow('Work Order Number', data['WONUMBER']),
-          const Divider(),
-          _buildDetailRow('Purchase Order No.', data['PONUMBER']),
-          const Divider(),
-          _buildDetailRow('Customer Name', data['CUSTOMERNAME']),
-          const Divider(),
-          _buildContactDetail(
-              'Focal Point', data['FOCALPOINTNAME'], data['FOCALPOINTNUMBER']),
-          const Divider(),
-          _buildContactDetail('ACPL Focal Point', data['ACPLFOCALPOINTNAME'],
-              data['ACPLFOCALPOINTNUMBER']),
-        ],
-      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDetailRow('Work Order Number', data['WONUMBER']),
+              const Divider(),
+              _buildDetailRow('Purchase Order No.', data['PONUMBER']),
+              const Divider(),
+              _buildDetailRow('Customer Name', data['CUSTOMERNAME']),
+              const Divider(),
+              _buildContactDetail('Focal Point', data['FOCALPOINTNAME'], data['FOCALPOINTNUMBER']),
+              const Divider(),
+              _buildContactDetail('ACPL Focal Point', data['ACPLFOCALPOINTNAME'], data['ACPLFOCALPOINTNUMBER']),
+            ],
+          ),
+        ),
+       
+      ],
     );
   }
 
@@ -62,7 +67,7 @@ class DetailsContainer extends StatelessWidget {
             child: Text(
               '$label:',
               style: TextStyle(
-                fontSize: 16 * textScaleFactor, // Adjusted font size
+                fontSize: 16 * textScaleFactor,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
@@ -73,7 +78,7 @@ class DetailsContainer extends StatelessWidget {
             child: Text(
               value ?? 'N/A',
               style: TextStyle(
-                fontSize: 18 * textScaleFactor, // Adjusted font size
+                fontSize: 18 * textScaleFactor,
               ),
               overflow: TextOverflow.ellipsis,
             ),
@@ -94,7 +99,7 @@ class DetailsContainer extends StatelessWidget {
             child: Text(
               '$label:',
               style: TextStyle(
-                fontSize: 16 * textScaleFactor, // Adjusted font size
+                fontSize: 16 * textScaleFactor,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
@@ -109,7 +114,7 @@ class DetailsContainer extends StatelessWidget {
                   Text(
                     name,
                     style: TextStyle(
-                      fontSize: 18 * textScaleFactor, // Adjusted font size
+                      fontSize: 18 * textScaleFactor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -121,7 +126,7 @@ class DetailsContainer extends StatelessWidget {
                       Text(
                         number,
                         style: TextStyle(
-                          fontSize: 18 * textScaleFactor, // Adjusted font size
+                          fontSize: 18 * textScaleFactor,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -129,7 +134,7 @@ class DetailsContainer extends StatelessWidget {
                         icon: Icon(
                           Icons.call,
                           color: Colors.green,
-                          size: 28 * textScaleFactor, // Increased size
+                          size: 28 * textScaleFactor,
                         ),
                         onPressed: () => _makePhoneCall(number),
                       ),
@@ -158,4 +163,5 @@ class DetailsContainer extends StatelessWidget {
       print('No phone number provided or it is empty');
     }
   }
+
 }
