@@ -94,7 +94,7 @@ class _SpecificWorkPageState extends State<SpecificWorkPage> {
         actions: [
           if (_userRole == 'ADMIN' || _userRole == 'Manager' || _userRole == 'Editor')
             IconButton(
-              icon: Image.asset('assets/edit.png'),
+              icon: Image.asset('assets/add.png'),
               onPressed: _showAddWorkDialog
             ),
         ],

@@ -5,14 +5,14 @@ class DetailsContainer extends StatelessWidget {
   final Map<String, dynamic> data;
   final double screenWidth;
   final double textScaleFactor;
-  final String userRole; // Added userRole as a parameter
+  final String userRole; 
 
   const DetailsContainer({
     super.key,
     required this.data,
     required this.screenWidth,
     required this.textScaleFactor,
-    required this.userRole, // Added userRole as a parameter
+    required this.userRole, 
   });
 
   @override

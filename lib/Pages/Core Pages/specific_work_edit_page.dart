@@ -58,24 +58,79 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
   }
 
   Future<void> _updateWorkDetails() async {
-  if (_formKey.currentState?.validate() ?? false) {
+    if (_formKey.currentState?.validate() ?? false) {
+      await FirebaseFirestore.instance
+          .collection('works')
+          .doc(widget.workOrderNumber)
+          .collection('specificWorks')
+          .doc(widget.workId)
+          .update({
+        'name': _nameController.text,
+        'quantity': _quantity.toString(),
+        'expectedDeliveryDate': DateFormat('dd-MMMM-yyyy').format(_expectedDate),
+        'completion': _completion.toString(),
+        'lastedit': DateFormat('dd-MMMM-yyyy HH:mm:ss').format(DateTime.now()), // Add this line
+      });
+
+      Navigator.pop(context);
+    }
+  }
+
+  Future<void> _deleteWork() async {
     await FirebaseFirestore.instance
         .collection('works')
         .doc(widget.workOrderNumber)
         .collection('specificWorks')
         .doc(widget.workId)
-        .update({
-      'name': _nameController.text,
-      'quantity': _quantity.toString(),
-      'expectedDeliveryDate': DateFormat('dd-MMMM-yyyy').format(_expectedDate),
-      'completion': _completion.toString(),
-      'lastedit': DateFormat('dd-MMMM-yyyy HH:mm:ss').format(DateTime.now()), // Add this line
-    });
+        .delete();
 
     Navigator.pop(context);
   }
-}
 
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Delete Work',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          content: const Text(
+            'Are you sure you want to delete this work?',
+            style: TextStyle(fontSize: 16),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog first
+                _deleteWork(); // Then delete the work
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text(
+                'Delete',
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,6 +202,29 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
                   ),
                 ),
               ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _showDeleteConfirmationDialog,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 5,
+                  ),
+                  child: Text(
+                    'Delete Work',
+                    style: GoogleFonts.lato(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -192,54 +270,53 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
     );
   }
 
- Widget _buildQuantityField() {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Expanded(
-        child: Text(
-          'Quantity',
-          style: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-      ),
-      Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.remove, color: AppColors.logoblue),
-            onPressed: () {
-              setState(() {
-                if (_quantity > 0) _quantity--;
-              });
-              _quantityController.text = _quantity.toString();
-            },
+  Widget _buildQuantityField() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Text(
+            'Quantity',
+            style: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          SizedBox(
-            width: 60,
-            child: Text(
-              _quantity.toString(),
-              textAlign: TextAlign.center,
-              style: GoogleFonts.lato(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+        ),
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.remove, color: AppColors.logoblue),
+              onPressed: () {
+                setState(() {
+                  if (_quantity > 0) _quantity--;
+                });
+                _quantityController.text = _quantity.toString();
+              },
+            ),
+            SizedBox(
+              width: 60,
+              child: Text(
+                _quantity.toString(),
+                textAlign: TextAlign.center,
+                style: GoogleFonts.lato(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.add, color: AppColors.logoblue),
-            onPressed: () {
-              setState(() {
-                _quantity++;
-              });
-              _quantityController.text = _quantity.toString();
-            },
-          ),
-        ],
-      ),
-    ],
-  );
-}
-
+            IconButton(
+              icon: const Icon(Icons.add, color: AppColors.logoblue),
+              onPressed: () {
+                setState(() {
+                  _quantity++;
+                });
+                _quantityController.text = _quantity.toString();
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 
   Widget _buildDateField() {
     return Column(

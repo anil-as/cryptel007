@@ -83,6 +83,7 @@ flutter:
     - assets/edit.png
     - assets/icons/bookmarks.svg
     - assets/bookmark.png
+    - assets/add.png
     - assets/app-drawer.png
     - assets/arrow.png
     - assets/logobluer.png
