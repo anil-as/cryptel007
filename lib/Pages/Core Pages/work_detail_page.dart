@@ -23,6 +23,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
   final UserRoleService _userRoleService = UserRoleService();
   String? _userRole;
   bool _isLoading = true;
+  bool _isBookmarked = false;
 
   @override
   void initState() {
@@ -32,6 +33,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
         _isLoading = true;
       });
       _fetchUserRole(account?.email);
+      _checkIfBookmarked(account?.email);
     });
     _googleSignIn.signInSilently();
   }
@@ -47,6 +49,48 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _checkIfBookmarked(String? email) async {
+    if (email == null) return;
+
+    final bookmarksRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(email)
+        .collection('bookmarks')
+        .doc(widget.workOrderNumber);
+
+    final doc = await bookmarksRef.get();
+
+    if (mounted) {
+      setState(() {
+        _isBookmarked = doc.exists;
+      });
+    }
+  }
+
+  Future<void> _toggleBookmark() async {
+    final userEmail = _googleSignIn.currentUser?.email;
+    if (userEmail == null) return;
+
+    final bookmarksRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userEmail)
+        .collection('bookmarks')
+        .doc(widget.workOrderNumber);
+
+    if (_isBookmarked) {
+      await bookmarksRef.delete();
+    } else {
+      await bookmarksRef.set({
+        'workOrderNumber': widget.workOrderNumber,
+        // Add other relevant fields if necessary
+      });
+    }
+
+    setState(() {
+      _isBookmarked = !_isBookmarked;
+    });
   }
 
   @override
@@ -71,12 +115,13 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
           },
         ),
         actions: [
-          IconButton(
-            icon: Image.asset('assets/bookmark.png'),
-            onPressed: () {
-              // Handle bookmark action
-            },
-          ),
+         IconButton(
+  icon: _isBookmarked
+      ? Image.asset('assets/bookmarkplus.png', width: 40, height: 40)
+      : Image.asset('assets/bookmarknormal.png', width: 37, height: 37),
+  onPressed: _toggleBookmark,
+)
+
         ],
       ),
       body: _isLoading
@@ -112,7 +157,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                         children: [
                           WorkHeader(
                             workOrderNumber: data['WONUMBER'],
-                             data: data,
+                            data: data,
                             workTitle: data['WORKTITLE'],
                             workPhoto: data['PHOTO'],
                             cdate: data['CDATE'],
@@ -126,7 +171,8 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                               data: data,
                               screenWidth: screenWidth,
                               textScaleFactor: textScaleFactor,
-                              userRole: _userRole.toString(), workOrderNumber: data['WONUMBER'],
+                              userRole: _userRole.toString(),
+                              workOrderNumber: data['WONUMBER'],
                             ),
                           ),
                           Padding(

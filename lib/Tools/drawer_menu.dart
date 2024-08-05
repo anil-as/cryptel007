@@ -4,6 +4,7 @@ import 'package:cryptel007/Pages/Core%20Pages/add_work_page.dart';
 import 'package:cryptel007/Pages/Core%20Pages/login_page.dart';
 import 'package:cryptel007/Pages/Navigation%20Pages/settings_page.dart';
 import 'package:cryptel007/Pages/Sub%20Pages/admin_page.dart';
+import 'package:cryptel007/Pages/Sub%20Pages/bookmark_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:cryptel007/Tools/user_role_service.dart';
 import 'package:flutter/material.dart';
@@ -205,13 +206,24 @@ class _DrawerMenuState extends State<DrawerMenu> {
                   _showAccessDeniedDialog();
                 }
               },
-              leading: const FaIcon(FontAwesomeIcons.barsProgress),
+              leading:  Image.asset('assets/project.png',width: 37,height: 37,),
               title: const Text('Work'),
               trailing: const Icon(
                 Icons.add,
                 color: Colors.white,
               ),
             ),
+             ListTile(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const BookmarkPage()),
+                );
+              },
+              leading:  Image.asset('assets/search.png',width: 37,height: 37,),
+              title: const Text('Search'),
+            ),
+            if(_userRole == 'ADMIN')
             ListTile(
               onTap: () {
                 if (_userRole == 'ADMIN') {
@@ -223,22 +235,33 @@ class _DrawerMenuState extends State<DrawerMenu> {
                   _showAccessDeniedDialog();
                 }
               },
-              leading: const FaIcon(FontAwesomeIcons.gears),
+              leading: Image.asset('assets/admin.png',width: 37,height: 37,),
               title: const Text('Admin'),
             ),
             ListTile(
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SettingsPage()),
+                  MaterialPageRoute(builder: (context) => const BookmarkPage()),
                 );
               },
-              leading: const FaIcon(FontAwesomeIcons.bookBookmark),
+              leading:  Image.asset('assets/bookmarkplus.png',width: 37,height: 37,),
               title: const Text('Saved'),
             ),
+             ListTile(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const BookmarkPage()),
+                );
+              },
+              leading:  Image.asset('assets/about.png',width: 37,height: 37,),
+              title: const Text('About'),
+            ),
+            
             ListTile(
               onTap: _showLogoutDialog,
-              leading: const FaIcon(FontAwesomeIcons.rightFromBracket),
+              leading:  Image.asset('assets/logout.png',width: 37,height: 37,),
               title: const Text('Logout'),
             ),
             const Spacer(),

@@ -5,6 +5,10 @@ class AppColors {
   static const Color logoblue = Color(0xFF2D2E92);
   static const Color lightblue = Color(0xFFCADCFC);
 
+  // Define gradient colors
+  static const Color gradientStart = Color(0xFF00B4DB); // Example gradient start color
+  static const Color gradientEnd = Color(0xFF0083B0); // Example gradient end color
+
   // Dark Royal Blue Shades
   static const Color royalBlue = Color(0xFF002366);
   static const Color darkRoyalBlue = Color(0xFF001A4D);
