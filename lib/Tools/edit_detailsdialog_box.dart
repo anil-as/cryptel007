@@ -1,3 +1,4 @@
+import 'package:cryptel007/Tools/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -38,6 +39,51 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
   }
 
   Future<void> _updateDetails() async {
+  // Show confirmation dialog
+  bool? confirmed = await showDialog<bool>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text(
+          'Confirm Save',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        content: const Text(
+          'Are you sure you want to save the changes?',
+          style: TextStyle(fontSize: 16),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text(
+              'Cancel',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop(false); // User clicked 'Cancel'
+            },
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop(true); // User clicked 'Save'
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.logoblue, // Update to your specific color
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text(
+              'Save',
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+
+  if (confirmed ?? false) {
+    // Proceed with saving the details if the user confirmed
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
 
@@ -45,62 +91,74 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
           .collection('works')
           .doc(widget.workOrderNumber)
           .update({
-            'WORKTITLE':_worktitle,
-        'PONUMBER': _purchaseOrderNumber,
-        'CUSTOMERNAME': _customerName,
-        'FOCALPOINTNAME': _focalPointName,
-        'FOCALPOINTNUMBER': _focalPointNumber,
-        'ACPLFOCALPOINTNAME': _acplFocalPointName,
-        'ACPLFOCALPOINTNUMBER': _acplFocalPointNumber,
-      });
+            'WORKTITLE': _worktitle,
+            'PONUMBER': _purchaseOrderNumber,
+            'CUSTOMERNAME': _customerName,
+            'FOCALPOINTNAME': _focalPointName,
+            'FOCALPOINTNUMBER': _focalPointNumber,
+            'ACPLFOCALPOINTNAME': _acplFocalPointName,
+            'ACPLFOCALPOINTNUMBER': _acplFocalPointNumber,
+          });
 
       Navigator.of(context).pop();
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Edit Details'),
+      title: Text(
+        'Edit Details',
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+      ),
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-               TextFormField(
+              _buildTextField(
+                icon: Icons.title,
+                label: 'Work Title',
                 initialValue: _worktitle,
-                decoration: const InputDecoration(labelText: 'Work Title'),
                 onSaved: (value) => _worktitle = value ?? '',
               ),
-              TextFormField(
+              _buildTextField(
+                icon: Icons.business,
+                label: 'Purchase Order No.',
                 initialValue: _purchaseOrderNumber,
-                decoration: const InputDecoration(labelText: 'Purchase Order No.'),
                 onSaved: (value) => _purchaseOrderNumber = value ?? '',
               ),
-              TextFormField(
+              _buildTextField(
+                icon: Icons.person,
+                label: 'Customer Name',
                 initialValue: _customerName,
-                decoration: const InputDecoration(labelText: 'Customer Name'),
                 onSaved: (value) => _customerName = value ?? '',
               ),
-              TextFormField(
+              _buildTextField(
+                icon: Icons.person_pin,
+                label: 'Focal Point Name',
                 initialValue: _focalPointName,
-                decoration: const InputDecoration(labelText: 'Focal Point Name'),
                 onSaved: (value) => _focalPointName = value ?? '',
               ),
-              TextFormField(
+              _buildTextField(
+                icon: Icons.phone,
+                label: 'Focal Point Number',
                 initialValue: _focalPointNumber,
-                decoration: const InputDecoration(labelText: 'Focal Point Number'),
                 onSaved: (value) => _focalPointNumber = value ?? '',
               ),
-              TextFormField(
+              _buildTextField(
+                icon: Icons.person,
+                label: 'ACPL Focal Point Name',
                 initialValue: _acplFocalPointName,
-                decoration: const InputDecoration(labelText: 'ACPL Focal Point Name'),
                 onSaved: (value) => _acplFocalPointName = value ?? '',
               ),
-              TextFormField(
+              _buildTextField(
+                icon: Icons.phone,
+                label: 'ACPL Focal Point Number',
                 initialValue: _acplFocalPointNumber,
-                decoration: const InputDecoration(labelText: 'ACPL Focal Point Number'),
                 onSaved: (value) => _acplFocalPointNumber = value ?? '',
               ),
             ],
@@ -110,13 +168,46 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(
+            'Cancel',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.red),
+          ),
         ),
         ElevatedButton(
           onPressed: _updateDetails,
-          child: const Text('Save'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          child: Text(
+            'Save',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.white),
+          ),
         ),
       ],
+    );
+  }
+
+  Widget _buildTextField({
+    required IconData icon,
+    required String label,
+    required String initialValue,
+    required void Function(String?) onSaved,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        initialValue: initialValue,
+        decoration: InputDecoration(
+          prefixIcon: Icon(icon, color: Colors.blue),
+          labelText: label,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
+        onSaved: onSaved,
+      ),
     );
   }
 }
