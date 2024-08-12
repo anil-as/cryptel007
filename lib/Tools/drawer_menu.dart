@@ -2,13 +2,12 @@
 
 import 'package:cryptel007/Pages/Core%20Pages/add_work_page.dart';
 import 'package:cryptel007/Pages/Core%20Pages/login_page.dart';
-import 'package:cryptel007/Pages/Navigation%20Pages/settings_page.dart';
+import 'package:cryptel007/Pages/Sub%20Pages/about_page.dart';
 import 'package:cryptel007/Pages/Sub%20Pages/admin_page.dart';
 import 'package:cryptel007/Pages/Sub%20Pages/bookmark_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:cryptel007/Tools/user_role_service.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class DrawerMenu extends StatefulWidget {
@@ -252,7 +251,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const BookmarkPage()),
+                  MaterialPageRoute(builder: (context) =>  AboutPage()),
                 );
               },
               leading:  Image.asset('assets/about.png',width: 37,height: 37,),

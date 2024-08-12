@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:intl/intl.dart';
 import 'package:cryptel007/Tools/colors.dart';
@@ -25,7 +29,8 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _expectedDateController = TextEditingController();
   final TextEditingController _completionController = TextEditingController();
-
+  File? _imageFile;
+  String? _imageUrl;
   int _quantity = 0;
   DateTime _expectedDate = DateTime.now();
   double _completion = 0.0;
@@ -53,12 +58,21 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
         _completion = double.tryParse(data['completion'] ?? '0') ?? 0.0;
         _completionController.text = _completion.toString();
         _expectedDateController.text = DateFormat('dd-MMMM-yyyy').format(_expectedDate);
+          _imageUrl = data['imageUrl'] ?? '';
+
       });
     }
   }
 
   Future<void> _updateWorkDetails() async {
     if (_formKey.currentState?.validate() ?? false) {
+      if (_imageFile != null) {
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('SpecificWorkImages/${widget.workOrderNumber}/$widget.workId.jpg');
+        await storageRef.putFile(_imageFile!);
+        _imageUrl = await storageRef.getDownloadURL();
+      }
       await FirebaseFirestore.instance
           .collection('works')
           .doc(widget.workOrderNumber)
@@ -69,7 +83,8 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
         'quantity': _quantity.toString(),
         'expectedDeliveryDate': DateFormat('dd-MMMM-yyyy').format(_expectedDate),
         'completion': _completion.toString(),
-        'lastedit': DateFormat('dd-MMMM-yyyy HH:mm:ss').format(DateTime.now()), // Add this line
+        'lastedit': DateFormat('dd-MMMM-yyyy HH:mm:ss').format(DateTime.now()),
+         'imageUrl': _imageUrl,
       });
 
       Navigator.pop(context);
@@ -131,6 +146,57 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
       },
     );
   }
+  Future<void> _pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
+  }
+   void _showSaveConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Update Work',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          content: const Text(
+            'Are you sure you want to Update this work?',
+            style: TextStyle(fontSize: 16),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed:_updateWorkDetails,
+              child: const Text(
+                'Cancel',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog first
+                _deleteWork(); // Then delete the work
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.logoblue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text(
+                'Delete',
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,6 +234,7 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
           key: _formKey,
           child: ListView(
             children: [
+              _buildImageSection(),
               _buildTextField(
                 controller: _nameController,
                 label: 'Work Name',
@@ -183,7 +250,7 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _updateWorkDetails,
+                  onPressed: _showSaveConfirmationDialog,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.logoblue,
                     padding: const EdgeInsets.symmetric(vertical: 15),
@@ -229,6 +296,44 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
           ),
         ),
       ),
+    );
+  }
+   Widget _buildImageSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Work Image',
+          style: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        GestureDetector(
+          onTap: _pickImage,
+          child: Container(
+            width: double.infinity,
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey),
+            ),
+            child: _imageFile != null
+                ? Image.file(_imageFile!, fit: BoxFit.cover)
+                : _imageUrl != null && _imageUrl!.isNotEmpty
+                    ? Image.network(_imageUrl!, fit: BoxFit.cover)
+                    : const Icon(
+                        Icons.camera_alt,
+                        color: Colors.grey,
+                        size: 50,
+                      ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          _imageFile != null ? 'Tap to change image' : 'Tap to upload image',
+          style: GoogleFonts.lato(fontSize: 14, color: Colors.grey),
+        ),
+      ],
     );
   }
 
