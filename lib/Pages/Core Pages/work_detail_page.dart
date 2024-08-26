@@ -3,6 +3,8 @@ import 'package:cryptel007/Pages/Core%20Pages/specific_work_page.dart';
 import 'package:cryptel007/Pages/Navigation%20Pages/home_page.dart';
 import 'package:cryptel007/Pages/Seperated%20Class/details_container.dart';
 import 'package:cryptel007/Pages/Seperated%20Class/work_header.dart';
+import 'package:cryptel007/Pages/Sub%20Pages/certification_page.dart';
+import 'package:cryptel007/Pages/Sub%20Pages/drawings_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:cryptel007/Tools/custom_button.dart';
 import 'package:cryptel007/Tools/user_role_service.dart';
@@ -115,13 +117,13 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
           },
         ),
         actions: [
-         IconButton(
-  icon: _isBookmarked
-      ? Image.asset('assets/bookmarkplus.png', width: 40, height: 40)
-      : Image.asset('assets/bookmarknormal.png', width: 37, height: 37),
-  onPressed: _toggleBookmark,
-)
-
+          IconButton(
+            icon: _isBookmarked
+                ? Image.asset('assets/bookmarkplus.png', width: 40, height: 40)
+                : Image.asset('assets/bookmarknormal.png',
+                    width: 37, height: 37),
+            onPressed: _toggleBookmark,
+          )
         ],
       ),
       body: _isLoading
@@ -176,7 +178,8 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                             ),
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal:  screenWidth * 0.04),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.04),
                             child: Column(
                               children: [
                                 CustomButton(
@@ -201,7 +204,15 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                 CustomButton(
                                   text: 'Certification',
                                   onPressed: () {
-                                    // Handle button 2 action
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              CertificationPage(
+                                                workOrderNumber:
+                                                    data['WONUMBER'],
+                                              )),
+                                    );
                                   },
                                   h: 47,
                                   w: double.infinity,
@@ -213,13 +224,21 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                     _userRole == 'Manager' ||
                                     _userRole == 'Editor')
                                   CustomButton(
-                                    text: 'Button 3',
+                                    text: 'Drawings',
                                     onPressed: () {
-                                      // Handle button 3 action
+                                        Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              DrawingsPage(
+                                                workOrderNumber:
+                                                    data['WONUMBER'],
+                                              )),
+                                    );
                                     },
                                     h: 47,
                                     w: double.infinity,
-                                    buttonColor: AppColors.logoblue,
+                                    buttonColor: AppColors.accentText,
                                     textColor: Colors.white,
                                   ),
                                 SizedBox(height: screenWidth * 0.02),

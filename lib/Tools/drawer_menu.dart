@@ -113,7 +113,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
             ElevatedButton(
               onPressed: logout,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.logoblue,
+                backgroundColor:Colors.red,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -216,7 +216,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const BookmarkPage()),
+                  MaterialPageRoute(builder: (context) =>  const BookmarkPage()),
                 );
               },
               leading:  Image.asset('assets/search.png',width: 37,height: 37,),

@@ -24,6 +24,12 @@ class AboutPage extends StatelessWidget {
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/home');
+          },
+        ),
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
@@ -180,26 +186,32 @@ class AboutPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () => _launchURL('https://twitter.com/yourprofile'),
+                      onTap: () =>
+                          _launchURL('https://twitter.com/yourprofile'),
                       child: CircleAvatar(
                         backgroundColor: Colors.white,
-                        child: Icon(FontAwesomeIcons.twitter, color: Colors.blue.shade600),
+                        child: Icon(FontAwesomeIcons.twitter,
+                            color: Colors.blue.shade600),
                       ),
                     ),
                     const SizedBox(width: 16),
                     GestureDetector(
-                      onTap: () => _launchURL('https://facebook.com/yourprofile'),
+                      onTap: () =>
+                          _launchURL('https://facebook.com/yourprofile'),
                       child: CircleAvatar(
                         backgroundColor: Colors.white,
-                        child: Icon(FontAwesomeIcons.facebookF, color: Colors.blue.shade900),
+                        child: Icon(FontAwesomeIcons.facebookF,
+                            color: Colors.blue.shade900),
                       ),
                     ),
                     const SizedBox(width: 16),
                     GestureDetector(
-                      onTap: () => _launchURL('https://linkedin.com/in/yourprofile'),
+                      onTap: () =>
+                          _launchURL('https://linkedin.com/in/yourprofile'),
                       child: CircleAvatar(
                         backgroundColor: Colors.white,
-                        child: Icon(FontAwesomeIcons.linkedinIn, color: Colors.blue.shade800),
+                        child: Icon(FontAwesomeIcons.linkedinIn,
+                            color: Colors.blue.shade800),
                       ),
                     ),
                   ],

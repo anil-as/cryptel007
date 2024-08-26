@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:cryptel007/Pages/Core%20Pages/specific_work_page.dart';
 import 'package:cryptel007/Pages/Core%20Pages/work_detail_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:cryptel007/Tools/custom_button.dart';
@@ -58,6 +57,7 @@ class _AddWorkPageState extends State<AddWorkPage> {
       'WONUMBER': _workOrderNumber,
       'PONUMBER': _purchaseordernumber,
       'CUSTOMERNAME': _customername,
+      'CUSTOMERNAME_LOWER': _customername.toLowerCase(),
       'CDATE': _creationDate,
       'FOCALPOINTNAME': _focalpointName,
       'FOCALPOINTNUMBER': _focalpointNumber,

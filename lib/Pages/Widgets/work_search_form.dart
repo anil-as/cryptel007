@@ -8,7 +8,7 @@ class WorkForm extends StatefulWidget {
   final TextEditingController passwordController;
   final bool isPasswordVisible;
   final VoidCallback onPasswordVisibilityToggle;
-  final VoidCallback onLogin;
+  final VoidCallback onClick;
 
   const WorkForm({
     super.key,
@@ -16,7 +16,7 @@ class WorkForm extends StatefulWidget {
     required this.passwordController,
     required this.isPasswordVisible,
     required this.onPasswordVisibilityToggle,
-    required this.onLogin,
+    required this.onClick,
   });
 
   @override
@@ -106,14 +106,14 @@ class _WorkFormState extends State<WorkForm> {
                 onPressed: widget.onPasswordVisibilityToggle,
               ),
             ),
-            onSubmitted: (_) => widget.onLogin(),
+            onSubmitted: (_) => widget.onClick(),
           ),
         ),
         const SizedBox(height: 17),
         CustomButton(
           buttonColor: AppColors.logoblue,
           text: 'Enter',
-          onPressed: widget.onLogin,
+          onPressed: widget.onClick,
           borderRadius: 12,
           suffixIcon: Icons.arrow_right,
         ),

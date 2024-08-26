@@ -30,11 +30,10 @@ class _HomePageState extends State<HomePage> {
     'assets/cnc200.png',
     'assets/cnclathee.png',
     'assets/cnccmm.png',
-    'assets/JBM.png',
     'assets/Con MM.png'
   ];
 
-  Future<void> _login() async {
+  Future<void> _search() async {
     final workOrderNumber = _workOrderController.text;
     final password = _passwordController.text;
 
@@ -110,7 +109,7 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const CompanyDescription(), 
+                const CompanyDescription(),
                 const SizedBox(height: 10),
                 CarouselWidget(
                   imgList: imgList,
@@ -123,8 +122,9 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 10),
                 Container(
-                  padding:
-                      EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.width * 0.04, horizontal: MediaQuery.of(context).size.width * 0.04),
+                  padding: EdgeInsets.symmetric(
+                      vertical: MediaQuery.of(context).size.width * 0.04,
+                      horizontal: MediaQuery.of(context).size.width * 0.04),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -145,7 +145,7 @@ class _HomePageState extends State<HomePage> {
                         _isPasswordVisible = !_isPasswordVisible;
                       });
                     },
-                    onLogin: _login,
+                    onClick: _search,
                   ),
                 ),
               ],
