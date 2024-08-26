@@ -123,7 +123,7 @@ class _DrawingsPageState extends State<DrawingsPage> {
                         );
                       },
                       child: Card(
-                        elevation: 5,
+                        elevation: 1,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15)),
                         child: Column(
