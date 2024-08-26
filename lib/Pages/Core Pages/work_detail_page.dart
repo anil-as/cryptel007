@@ -95,6 +95,83 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
     });
   }
 
+  Future<void> _confirmAndDeleteWorkOrder(String workOrderNumber) async {
+    bool shouldDelete = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Work Order'),
+        content: const Text(
+            'Are you sure you want to delete this work order? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false); // Cancel deletion
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(true); // Confirm deletion
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete == true) {
+      setState(() {
+        _isLoading = true; // Show loading icon
+      });
+
+      try {
+        // Delete the work order document
+        final workOrderRef =
+            FirebaseFirestore.instance.collection('works').doc(workOrderNumber);
+
+        // Optionally, delete related subcollections such as drawings, certifications, etc.
+        final subCollections = [
+          'drawings',
+          'certifications'
+        ]; // Add more if needed
+
+        // Loop through subcollections and delete each document
+        for (String subCollection in subCollections) {
+          final QuerySnapshot subCollectionSnapshot =
+              await workOrderRef.collection(subCollection).get();
+
+          for (QueryDocumentSnapshot doc in subCollectionSnapshot.docs) {
+            await doc.reference.delete();
+          }
+        }
+
+        // Finally, delete the main work order document
+        await workOrderRef.delete();
+
+        // Show success feedback to the user
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Work order deleted successfully')),
+        );
+
+        // Navigate back to the HomePage
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+          (route) => false, // Removes all previous routes
+        );
+      } catch (e) {
+        // Handle any errors
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete work order: $e')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false; // Hide loading icon
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -127,7 +204,10 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(
+              color: AppColors.logoblue,
+            ))
           : CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
@@ -226,15 +306,14 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                   CustomButton(
                                     text: 'Drawings',
                                     onPressed: () {
-                                        Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              DrawingsPage(
-                                                workOrderNumber:
-                                                    data['WONUMBER'],
-                                              )),
-                                    );
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => DrawingsPage(
+                                                  workOrderNumber:
+                                                      data['WONUMBER'],
+                                                )),
+                                      );
                                     },
                                     h: 47,
                                     w: double.infinity,
@@ -246,13 +325,14 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                     _userRole == 'Manager' ||
                                     _userRole == 'Editor')
                                   CustomButton(
-                                    text: 'Button 4',
-                                    onPressed: () {
-                                      // Handle button 4 action
+                                    text: 'Delete this Work',
+                                    onPressed: () async {
+                                      await _confirmAndDeleteWorkOrder(
+                                          data['WONUMBER']);
                                     },
                                     h: 47,
                                     w: double.infinity,
-                                    buttonColor: AppColors.logoblue,
+                                    buttonColor:Colors.red,
                                     textColor: Colors.white,
                                   ),
                               ],

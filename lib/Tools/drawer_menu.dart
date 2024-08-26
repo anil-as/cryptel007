@@ -212,16 +212,16 @@ class _DrawerMenuState extends State<DrawerMenu> {
                 color: Colors.white,
               ),
             ),
-             ListTile(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  const BookmarkPage()),
-                );
-              },
-              leading:  Image.asset('assets/search.png',width: 37,height: 37,),
-              title: const Text('Search'),
-            ),
+            //  ListTile(
+            //   onTap: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (context) =>  const BookmarkPage()),
+            //     );
+            //   },
+            //   leading:  Image.asset('assets/search.png',width: 37,height: 37,),
+            //   title: const Text('Search'),
+            // ),
             if(_userRole == 'ADMIN')
             ListTile(
               onTap: () {

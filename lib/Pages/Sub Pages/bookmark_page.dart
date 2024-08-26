@@ -63,6 +63,7 @@ class _BookmarkPageState extends State<BookmarkPage> {
       appBar: AppBar(
         title: const Text('Saved'),
         backgroundColor: AppColors.lightGrey,
+        elevation: 0,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -112,10 +113,9 @@ class _BookmarkPageState extends State<BookmarkPage> {
                         final workDetails = snapshot.data;
 
                         return Card(
-                          elevation: 0,
-                          color: Colors.white, // Set your desired color here
+                          elevation: 10,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           child: InkWell(
                             onTap: () {
@@ -128,26 +128,41 @@ class _BookmarkPageState extends State<BookmarkPage> {
                                 ),
                               );
                             },
-                            child: Padding(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Colors.blueGrey.shade900, Colors.blue.shade600],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    spreadRadius: 2,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
                               padding: const EdgeInsets.all(16.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
                                     'Work Order: $workOrderNumber',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
-                                      color: AppColors.logoblue,
+                                      color: Colors.white,
                                     ),
                                   ),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 10),
                                   Text(
                                     'Title: ${workDetails?['WORKTITLE'] ?? 'N/A'}',
                                     style: const TextStyle(
                                       fontSize: 16,
-                                      color: Colors.black87,
+                                      color: Colors.white70,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -155,16 +170,16 @@ class _BookmarkPageState extends State<BookmarkPage> {
                                     'Customer: ${workDetails?['CUSTOMERNAME'] ?? 'N/A'}',
                                     style: const TextStyle(
                                       fontSize: 14,
-                                      color: Colors.black54,
+                                      color: Colors.white54,
                                     ),
                                   ),
                                   const Spacer(),
-                                  const Align(
+                                  Align(
                                     alignment: Alignment.bottomRight,
                                     child: Icon(
                                       Icons.arrow_forward_ios,
-                                      color: AppColors.logoblue,
-                                      size: 20,
+                                      color: Colors.white.withOpacity(0.9),
+                                      size: 22,
                                     ),
                                   ),
                                 ],
