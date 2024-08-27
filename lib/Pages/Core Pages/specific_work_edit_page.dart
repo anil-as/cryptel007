@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cryptel007/Pages/Core%20Pages/specific_work_page.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -34,6 +35,7 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
   int _quantity = 0;
   DateTime _expectedDate = DateTime.now();
   double _completion = 0.0;
+  bool isLoading =false;
 
   @override
   void initState() {
@@ -42,6 +44,9 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
   }
 
   Future<void> _fetchWorkDetails() async {
+    setState(() {
+      isLoading =true;
+    });
     final doc = await FirebaseFirestore.instance
         .collection('works')
         .doc(widget.workOrderNumber)
@@ -54,22 +59,28 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
       setState(() {
         _nameController.text = data['name'] ?? '';
         _quantity = int.tryParse(data['quantity'] ?? '0') ?? 0;
-        _expectedDate = DateTime.tryParse(data['expectedDeliveryDate'] ?? '') ?? DateTime.now();
+        _expectedDate = DateTime.tryParse(data['expectedDeliveryDate'] ?? '') ??
+            DateTime.now();
         _completion = double.tryParse(data['completion'] ?? '0') ?? 0.0;
         _completionController.text = _completion.toString();
-        _expectedDateController.text = DateFormat('dd-MMMM-yyyy').format(_expectedDate);
-          _imageUrl = data['imageUrl'] ?? '';
-
+        _expectedDateController.text =
+            DateFormat('dd-MMMM-yyyy').format(_expectedDate);
+        _imageUrl = data['imageUrl'] ?? '';
       });
     }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   Future<void> _updateWorkDetails() async {
     if (_formKey.currentState?.validate() ?? false) {
       if (_imageFile != null) {
-        final storageRef = FirebaseStorage.instance
-            .ref()
-            .child('SpecificWorkImages/${widget.workOrderNumber}/$widget.workId.jpg');
+        setState(() {
+          isLoading=true;
+        });
+        final storageRef = FirebaseStorage.instance.ref().child(
+            'SpecificWorkImages/${widget.workOrderNumber}/$widget.workId.jpg');
         await storageRef.putFile(_imageFile!);
         _imageUrl = await storageRef.getDownloadURL();
       }
@@ -81,13 +92,21 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
           .update({
         'name': _nameController.text,
         'quantity': _quantity.toString(),
-        'expectedDeliveryDate': DateFormat('dd-MMMM-yyyy').format(_expectedDate),
+        'expectedDeliveryDate':
+            DateFormat('dd-MMMM-yyyy').format(_expectedDate),
         'completion': _completion.toString(),
         'lastedit': DateFormat('dd-MMMM-yyyy HH:mm:ss').format(DateTime.now()),
-         'imageUrl': _imageUrl,
+        'imageUrl': _imageUrl,
       });
-
-      Navigator.pop(context);
+      setState(() {
+        isLoading=false;
+      });
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) =>
+              SpecificWorkPage(workOrderNumber: widget.workOrderNumber),
+        ),
+      );
     }
   }
 
@@ -98,8 +117,6 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
         .collection('specificWorks')
         .doc(widget.workId)
         .delete();
-
-    Navigator.pop(context);
   }
 
   void _showDeleteConfirmationDialog() {
@@ -146,8 +163,10 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
       },
     );
   }
+
   Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       setState(() {
@@ -155,7 +174,8 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
       });
     }
   }
-   void _showSaveConfirmationDialog() {
+
+  void _showSaveConfirmationDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -170,17 +190,14 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
           ),
           actions: <Widget>[
             TextButton(
-              onPressed:_updateWorkDetails,
+              onPressed: _updateWorkDetails,
               child: const Text(
                 'Cancel',
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ),
             ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog first
-                _deleteWork(); // Then delete the work
-              },
+              onPressed: _updateWorkDetails,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.logoblue,
                 shape: RoundedRectangleBorder(
@@ -188,7 +205,7 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
                 ),
               ),
               child: const Text(
-                'Delete',
+                'UPDATE',
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
             ),
@@ -217,15 +234,19 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save, color: Colors.white),
-            onPressed: _updateWorkDetails,
-            color: AppColors.logoblue,
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.save, color: Colors.green),
+        //     onPressed: _updateWorkDetails,
+        //     color: AppColors.logoblue,
+        //   ),
+        // ],
       ),
-      body: Padding(
+      body:isLoading 
+  ? Center(
+      child: CircularProgressIndicator(),
+    )
+  : Padding(
         padding: EdgeInsets.symmetric(
           horizontal: MediaQuery.of(context).size.width * 0.05,
           vertical: MediaQuery.of(context).size.height * 0.02,
@@ -298,7 +319,8 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
       ),
     );
   }
-   Widget _buildImageSection() {
+
+  Widget _buildImageSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -367,7 +389,8 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
           validator: validator,
         ),
@@ -443,7 +466,8 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             suffixIcon: IconButton(
               icon: const Icon(Icons.calendar_today, color: AppColors.logoblue),
               onPressed: () async {
@@ -456,7 +480,8 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
                 if (picked != null && picked != _expectedDate) {
                   setState(() {
                     _expectedDate = picked;
-                    _expectedDateController.text = DateFormat('yyyy-MM-dd').format(_expectedDate);
+                    _expectedDateController.text =
+                        DateFormat('yyyy-MM-dd').format(_expectedDate);
                   });
                 }
               },
@@ -489,7 +514,8 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
                   percent: _completion / 100,
                   center: Text(
                     '${_completion.toStringAsFixed(0)}%',
-                    style: GoogleFonts.lato(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.lato(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   circularStrokeCap: CircularStrokeCap.round,
                   progressColor: AppColors.logoblue,
