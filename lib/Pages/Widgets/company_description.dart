@@ -1,3 +1,4 @@
+import 'package:cryptel007/Tools/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -14,16 +15,16 @@ class CompanyDescription extends StatelessWidget {
           Text(
             'CRYO PRECISION TECHNOLOGIES',
             style: GoogleFonts.roboto(
-              fontSize: 24,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: AppColors.logoblue,
             ),
           ),
           const SizedBox(height: 7),
           Text(
             'Cryo Precision Technologies (Cryptel) has been created to addresss the high demand in the aerospace industry, for reliable precision manufacturing services',
             style: GoogleFonts.openSans(
-              fontSize: 16,
+              fontSize: 12,
               color: Colors.black54,
               height: 1.5,
             ),
@@ -32,7 +33,7 @@ class CompanyDescription extends StatelessWidget {
           Text(
             'We are promoted by a group of professionals with a combined experience of more than 20 years in the aerospace and defencce industries in india.',
             style: GoogleFonts.openSans(
-              fontSize: 16,
+              fontSize: 12,
               color: Colors.black54,
               height: 1.5,
             ),
@@ -41,7 +42,7 @@ class CompanyDescription extends StatelessWidget {
           Text(
             'We understand both functional and assembly requirements in the aerospace industry, in terms of geometrical and dimensional tolerances and the need to meet them strictly.',
             style: GoogleFonts.openSans(
-              fontSize: 16,
+              fontSize: 12,
               color: Colors.black54,
               height: 1.5,
             ),

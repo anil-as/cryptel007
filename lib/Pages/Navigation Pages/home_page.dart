@@ -1,7 +1,7 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cryptel007/Pages/Core%20Pages/work_detail_page.dart';
-import 'package:cryptel007/Pages/Widgets/carousel_widget.dart';
-import 'package:cryptel007/Pages/Widgets/company_description.dart'; // Import the new widget
+import 'package:cryptel007/Pages/Widgets/company_description.dart';
 import 'package:cryptel007/Pages/Widgets/custom_app_bar.dart';
 import 'package:cryptel007/Pages/Widgets/work_search_form.dart';
 import 'package:cryptel007/Tools/colors.dart';
@@ -32,6 +32,26 @@ class _HomePageState extends State<HomePage> {
     'assets/cnccmm.png',
     'assets/Con MM.png'
   ];
+
+  late Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
+      setState(() {
+        _current = (_current + 1) % imgList.length;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    _workOrderController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   Future<void> _search() async {
     final workOrderNumber = _workOrderController.text;
@@ -110,17 +130,41 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const CompanyDescription(),
-                const SizedBox(height: 10),
-                CarouselWidget(
-                  imgList: imgList,
-                  currentIndex: _current,
-                  onPageChanged: (index) {
-                    setState(() {
-                      _current = index;
-                    });
-                  },
+                const SizedBox(height: 17),
+
+                // Photo Slider
+                Container(
+                  height: MediaQuery.of(context).size.width * 0.5,
+                  child: PageView.builder(
+                    itemCount: imgList.length,
+                    controller: PageController(viewportFraction: 2),
+                    onPageChanged: (index) {
+                      setState(() {
+                        _current = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      return AnimatedBuilder(
+                        animation: PageController(viewportFraction: 0.8),
+                        builder: (context, child) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 10),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(15),
+                              child: Image.asset(
+                                imgList[_current],
+                                fit: BoxFit.fitHeight,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 17),
+
+                // WorkForm
                 Container(
                   padding: EdgeInsets.symmetric(
                       vertical: MediaQuery.of(context).size.width * 0.04,
@@ -157,6 +201,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _handleMenuButtonPressed() {
+    FocusScope.of(context).unfocus();
     _advancedDrawerController.showDrawer();
   }
 }

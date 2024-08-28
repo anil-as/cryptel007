@@ -36,11 +36,16 @@ class _WorkFormState extends State<WorkForm> {
 
   @override
   Widget build(BuildContext context) {
+    final double textSize = MediaQuery.of(context).size.width * 0.045;
+
     return Column(
       children: [
         Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.width * 0.03, horizontal: MediaQuery.of(context).size.width * 0.04),
+          padding: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.width * 0.03,
+            horizontal: MediaQuery.of(context).size.width * 0.04,
+          ),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
@@ -55,13 +60,17 @@ class _WorkFormState extends State<WorkForm> {
           child: TextField(
             controller: widget.workOrderController,
             focusNode: _workOrderFocusNode,
+            style: TextStyle(
+              fontSize: textSize,
+              color: AppColors.logoblue,
+            ),
             decoration: InputDecoration(
               border: InputBorder.none,
               labelText: 'Work Order No.',
               labelStyle: TextStyle(
                 fontFamily: GoogleFonts.habibi().fontFamily,
                 color: AppColors.logoblue,
-                fontSize: MediaQuery.of(context).size.width * 0.045,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -70,10 +79,13 @@ class _WorkFormState extends State<WorkForm> {
             },
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 7),
         Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.width * 0.03, horizontal: MediaQuery.of(context).size.width * 0.04),
+          padding: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.width * 0.03,
+            horizontal: MediaQuery.of(context).size.width * 0.04,
+          ),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
@@ -89,12 +101,16 @@ class _WorkFormState extends State<WorkForm> {
             controller: widget.passwordController,
             focusNode: _passwordFocusNode,
             obscureText: !widget.isPasswordVisible,
+            style: TextStyle(
+              fontSize: textSize,
+              color: AppColors.logoblue,
+            ),
             decoration: InputDecoration(
               border: InputBorder.none,
               labelText: 'Password',
               labelStyle: TextStyle(
                 color: AppColors.logoblue,
-                fontSize: MediaQuery.of(context).size.width * 0.045,
+                fontSize: 14,
                 fontFamily: GoogleFonts.habibi().fontFamily,
                 fontWeight: FontWeight.bold,
               ),
@@ -109,10 +125,11 @@ class _WorkFormState extends State<WorkForm> {
             onSubmitted: (_) => widget.onClick(),
           ),
         ),
-        const SizedBox(height: 17),
+        const SizedBox(height: 10),
         CustomButton(
           buttonColor: AppColors.logoblue,
           text: 'Enter',
+          fsize: 16,
           onPressed: widget.onClick,
           borderRadius: 12,
           suffixIcon: Icons.arrow_right,
