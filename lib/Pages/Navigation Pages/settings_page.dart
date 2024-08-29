@@ -167,7 +167,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             if (_userRole == 'ADMIN') {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const AdminPage()),
+                                MaterialPageRoute(builder: (context) =>  AdminPage()),
                               );
                             } else {
                               _showAccessDeniedDialog();

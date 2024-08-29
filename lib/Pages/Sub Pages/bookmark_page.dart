@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cryptel007/Pages/Core%20Pages/work_detail_page.dart';
+import 'package:cryptel007/Pages/Navigation%20Pages/home_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -61,6 +62,15 @@ class _BookmarkPageState extends State<BookmarkPage> {
     return Scaffold(
       backgroundColor: AppColors.lightGrey,
       appBar: AppBar(
+        leading: IconButton(
+          icon: Image.asset('assets/arrow.png'),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
+          },
+        ),
         title: const Text('Saved'),
         backgroundColor: AppColors.lightGrey,
         elevation: 0,

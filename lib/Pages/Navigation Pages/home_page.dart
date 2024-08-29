@@ -201,7 +201,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _handleMenuButtonPressed() {
-    FocusScope.of(context).unfocus();
+    // FocusScope.of(context).unfocus();
     _advancedDrawerController.showDrawer();
   }
 }

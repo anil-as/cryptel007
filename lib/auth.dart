@@ -8,42 +8,54 @@ class AuthMethods {
 
   User? get user => _auth.currentUser;
 
-  Future<bool> signInWithGoogle() async {
-    bool result = false;
+  Future<String?> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
 
-      UserCredential userCredential = await _auth.signInWithCredential(credential);
+      UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
       User? user = userCredential.user;
 
       if (user != null && user.email != null) {
+        DocumentReference userDocRef =
+            _firestore.collection('users').doc(user.email);
+
         if (userCredential.additionalUserInfo!.isNewUser) {
           // Add the data to Firestore with email as the document ID
-          await _firestore.collection('users').doc(user.email).set({
+          await userDocRef.set({
             'username': user.displayName,
             'uid': user.uid,
             'profilePhoto': user.photoURL,
             'email': user.email,
-            'role': 'CUSTOMER',
+            'role': 'Customer',
+            'access': 'Requesting', // Default access status
+            'createdAt':
+                FieldValue.serverTimestamp(), // Add timestamp for creation
           });
+        } else {
+          // If the user already exists, retrieve the access status
+          DocumentSnapshot userDoc = await userDocRef.get();
+          String? accessStatus = userDoc['access'];
+
+          return accessStatus; // Return the access status
         }
-        result = true;
       }
-      return result;
     } catch (e) {
       print('Failed to sign in with Google: $e');
+      return null;
     }
-    return result;
+    return 'Requesting'; // Return 'Requesting' for new users
   }
 
   void signOut() async {
     try {
-      _auth.signOut();
+      await _auth.signOut();
     } catch (e) {
       print('Cannot sign out: $e');
     }

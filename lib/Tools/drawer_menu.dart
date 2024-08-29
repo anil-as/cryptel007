@@ -58,35 +58,6 @@ class _DrawerMenuState extends State<DrawerMenu> {
     }
   }
 
-  void _showAccessDeniedDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Access Denied',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          content: const Text(
-            'Only authorized users have access to this section.',
-            style: TextStyle(fontSize: 16),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text(
-                'OK',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void _showLogoutDialog() {
     showDialog(
       context: context,
@@ -113,7 +84,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
             ElevatedButton(
               onPressed: logout,
               style: ElevatedButton.styleFrom(
-                backgroundColor:Colors.red,
+                backgroundColor: Colors.red,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -131,150 +102,167 @@ class _DrawerMenuState extends State<DrawerMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: ListTileTheme(
-        textColor: Colors.white,
-        iconColor: Colors.white,
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Container(
-              width: 128.0,
-              height: 128.0,
-              margin: const EdgeInsets.only(
-                top: 24.0,
-                bottom: 24.0,
-              ),
-              child: Center(
-                child: Image.asset(
-                  'assets/logobluer.png',
-                  width: 100.0,
-                  height: 100.0,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 30,
-                      backgroundImage: _currentUser?.photoUrl != null && _currentUser!.photoUrl!.isNotEmpty
-                          ? NetworkImage(_currentUser!.photoUrl!)
-                          : const AssetImage('assets/profileimg.png') as ImageProvider,
-                    ),
-                    title: Text(
-                      _currentUser?.displayName ?? '',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _currentUser?.email ?? '',
-                          style: const TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                        const SizedBox(height: 4),
-                        if(_userRole != 'USER')
-                        _isLoading
-                          ? const CircularProgressIndicator()
-                          : Text(
-                              _userRole ?? '',
-                              style: const TextStyle(fontSize: 16, color: AppColors.logoblue),
-                            ),
-                      ],
-                    ),
+    return SingleChildScrollView(
+      child: SafeArea(
+        child: ListTileTheme(
+          textColor: Colors.white,
+          iconColor: Colors.white,
+          child: Column(
+            children: [
+              SizedBox(
+                width: 148.0,
+                height: 148.0,
+                child: Center(
+                  child: Image.asset(
+                    'assets/logobluer.png',
+                    width: 100.0,
+                    height: 100.0,
+                    color: Colors.white,
                   ),
                 ),
               ),
-            ),
-            ListTile(
-              onTap: () {
-                if (_userRole == 'ADMIN' || _userRole == 'Manager' || _userRole == 'Editor') {
+              
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 17, left: 7, right: 7),
+                  child: Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        radius: 30,
+                        backgroundImage: _currentUser?.photoUrl != null &&
+                                _currentUser!.photoUrl!.isNotEmpty
+                            ? NetworkImage(_currentUser!.photoUrl!)
+                            : const AssetImage('assets/profileimg.png')
+                                as ImageProvider,
+                      ),
+                      title: Text(
+                        _currentUser?.displayName ?? '',
+                        style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _currentUser?.email ?? '',
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.grey),
+                          ),
+                          const SizedBox(height: 4),
+                          if (_userRole != 'USER')
+                            _isLoading
+                                ? const CircularProgressIndicator()
+                                : Text(
+                                    _userRole ?? '',
+                                    style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.logoblue),
+                                  ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              if (_userRole == 'ADMIN' ||
+                  _userRole == 'Manager' ||
+                  _userRole == 'Editor')
+                ListTile(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AddWorkPage()),
+                    );
+                  },
+                  leading: Image.asset(
+                    'assets/project.png',
+                    width: 34,
+                    height: 34,
+                  ),
+                  title: const Text(
+                    'Work',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                  trailing: const Icon(
+                    Icons.add,
+                    color: Colors.white,
+                  ),
+                ),
+              if (_userRole == 'ADMIN')
+                ListTile(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AdminPage()),
+                    );
+                  },
+                  leading: Image.asset(
+                    'assets/admin.png',
+                    width: 34,
+                    height: 34,
+                  ),
+                  title: const Text(
+                    'Admin',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ListTile(
+                onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const AddWorkPage()),
+                    MaterialPageRoute(
+                        builder: (context) => const BookmarkPage()),
                   );
-                } else {
-                  _showAccessDeniedDialog();
-                }
-              },
-              leading:  Image.asset('assets/project.png',width: 37,height: 37,),
-              title: const Text('Work'),
-              trailing: const Icon(
-                Icons.add,
-                color: Colors.white,
+                },
+                leading: Image.asset(
+                  'assets/bookmarkplus.png',
+                  width: 34,
+                  height: 34,
+                ),
+                title: const Text(
+                  'Saved',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
-            //  ListTile(
-            //   onTap: () {
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(builder: (context) =>  const BookmarkPage()),
-            //     );
-            //   },
-            //   leading:  Image.asset('assets/search.png',width: 37,height: 37,),
-            //   title: const Text('Search'),
-            // ),
-            if(_userRole == 'ADMIN')
-            ListTile(
-              onTap: () {
-                if (_userRole == 'ADMIN') {
+              ListTile(
+                onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const AdminPage()),
+                    MaterialPageRoute(builder: (context) => AboutPage()),
                   );
-                } else {
-                  _showAccessDeniedDialog();
-                }
-              },
-              leading: Image.asset('assets/admin.png',width: 37,height: 37,),
-              title: const Text('Admin'),
-            ),
-            ListTile(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const BookmarkPage()),
-                );
-              },
-              leading:  Image.asset('assets/bookmarkplus.png',width: 37,height: 37,),
-              title: const Text('Saved'),
-            ),
-             ListTile(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  AboutPage()),
-                );
-              },
-              leading:  Image.asset('assets/about.png',width: 37,height: 37,),
-              title: const Text('About'),
-            ),
-            
-            ListTile(
-              onTap: _showLogoutDialog,
-              leading:  Image.asset('assets/logout.png',width: 37,height: 37,),
-              title: const Text('Logout'),
-            ),
-            const Spacer(),
-            const DefaultTextStyle(
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.black,
+                },
+                leading: Image.asset(
+                  'assets/about.png',
+                  width: 34,
+                  height: 34,
+                ),
+                title: const Text(
+                  'About',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
               ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 16.0),
-                child: Text('Terms of Service | Privacy Policy'),
+              ListTile(
+                onTap: _showLogoutDialog,
+                leading: Image.asset(
+                  'assets/logout.png',
+                  width: 34,
+                  height: 34,
+                ),
+                title: const Text(
+                  'Logout',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
