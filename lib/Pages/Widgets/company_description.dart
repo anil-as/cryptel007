@@ -7,48 +7,45 @@ class CompanyDescription extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.0005),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'CRYO PRECISION TECHNOLOGIES',
-            style: GoogleFonts.roboto(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: AppColors.logoblue,
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'CRYO PRECISION TECHNOLOGIES',
+          style: GoogleFonts.roboto(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.logoblue,
           ),
-          const SizedBox(height: 7),
-          Text(
-            'Cryo Precision Technologies (Cryptel) has been created to addresss the high demand in the aerospace industry, for reliable precision manufacturing services',
-            style: GoogleFonts.openSans(
-              fontSize: 12,
-              color: Colors.black54,
-              height: 1.5,
-            ),
+        ),
+        const SizedBox(height: 7),
+        Text(
+          'Cryo Precision Technologies (Cryptel) has been created to addresss the high demand in the aerospace industry, for reliable precision manufacturing services',
+          style: GoogleFonts.openSans(
+            fontSize: 13,
+            color: Colors.black54,
+            height: 1.5,
           ),
-          const SizedBox(height: 7),
-          Text(
-            'We are promoted by a group of professionals with a combined experience of more than 20 years in the aerospace and defencce industries in india.',
-            style: GoogleFonts.openSans(
-              fontSize: 12,
-              color: Colors.black54,
-              height: 1.5,
-            ),
+        ),
+        const SizedBox(height: 7),
+        Text(
+          'We are promoted by a group of professionals with a combined experience of more than 20 years in the aerospace and defencce industries in india.',
+          style: GoogleFonts.openSans(
+            fontSize: 13,
+            color: Colors.black54,
+            height: 1.5,
           ),
-          const SizedBox(height: 7),
-          Text(
-            'We understand both functional and assembly requirements in the aerospace industry, in terms of geometrical and dimensional tolerances and the need to meet them strictly.',
-            style: GoogleFonts.openSans(
-              fontSize: 12,
-              color: Colors.black54,
-              height: 1.5,
-            ),
+        ),
+        const SizedBox(height: 7),
+        Text(
+          'We understand both functional and assembly requirements in the aerospace industry, in terms of geometrical and dimensional tolerances and the need to meet them strictly.',
+          style: GoogleFonts.openSans(
+            fontSize: 13,
+            color: Colors.black54,
+            height: 1.5,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

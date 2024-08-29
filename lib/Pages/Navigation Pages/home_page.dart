@@ -127,7 +127,7 @@ class _HomePageState extends State<HomePage> {
           child: SingleChildScrollView(
             padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const CompanyDescription(),
                 const SizedBox(height: 17),
