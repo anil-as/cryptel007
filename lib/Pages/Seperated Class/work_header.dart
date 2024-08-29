@@ -35,6 +35,7 @@ class WorkHeader extends StatefulWidget {
 class _WorkHeaderState extends State<WorkHeader> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   String? _userRole;
+
   @override
   void initState() {
     super.initState();
@@ -47,10 +48,21 @@ class _WorkHeaderState extends State<WorkHeader> {
   Future<void> _fetchUserRole(String? email) async {
     if (email == null) return;
 
-    if (mounted) {
-      setState(() {
-        _userRole = _userRole;
-      });
+    try {
+      // Fetch the user role from Firestore
+      DocumentSnapshot userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(email).get();
+
+      if (userDoc.exists) {
+        setState(() {
+          _userRole = userDoc[
+              'role']; // Assuming 'role' is a field in your Firestore user document
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to fetch user role: $e')),
+      );
     }
   }
 
@@ -82,8 +94,8 @@ class _WorkHeaderState extends State<WorkHeader> {
                       borderRadius: BorderRadius.circular(8.0),
                       child: Image.asset(
                         'assets/whitelogo.png',
-                        width: 130,
-                        height: 130,
+                        width: 100,
+                        height: 100,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -95,7 +107,7 @@ class _WorkHeaderState extends State<WorkHeader> {
                             widget.workTitle?.toUpperCase() ??
                                 'NO TITLE AVAILABLE',
                             style: const TextStyle(
-                              fontSize: 24,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -105,8 +117,7 @@ class _WorkHeaderState extends State<WorkHeader> {
                               DateFormat('MMMM dd, yyyy - hh:mm a')
                                   .format(widget.cdate!.toDate()),
                               style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 11,
                                 color: Colors.white,
                               ),
                             ),
@@ -152,21 +163,19 @@ class _WorkHeaderState extends State<WorkHeader> {
             ),
           ),
         ),
-        if (_userRole == 'ADMIN' ||
-            _userRole == 'Manager' ||
-            _userRole == 'Editor')
-          Positioned(
-            bottom: widget.screenWidth * 0.04,
-            right: widget.screenWidth * 0.04,
-            child: GestureDetector(
-                onTap: () => _showEditDialog(context),
-                child: Image.asset(
-                  'assets/edit.png',
-                  width: 30,
-                  height: 30,
-                  color: Colors.white,
-                )),
-          ),
+        if(_userRole == 'ADMIN')
+        Positioned(
+          bottom: widget.screenWidth * 0.04,
+          right: widget.screenWidth * 0.04,
+          child: GestureDetector(
+              onTap: () => _showEditDialog(context),
+              child: Image.asset(
+                'assets/edit.png',
+                width: 24,
+                height: 14,
+                color: Colors.white,
+              )),
+        ),
       ],
     );
   }

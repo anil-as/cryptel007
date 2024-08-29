@@ -41,13 +41,13 @@ class DetailsContainer extends StatelessWidget {
             children: [
               _buildDetailRow('Work Order Number', data['WONUMBER']),
               const Divider(),
-              _buildDetailRow('Purchase Order No.', data['PONUMBER']),
+              _buildDetailRow('Purchase Order No', data['PONUMBER']),
               const Divider(),
               _buildDetailRow('Customer Name', data['CUSTOMERNAME']),
               const Divider(),
               _buildContactDetail('Focal Point', data['FOCALPOINTNAME'], data['FOCALPOINTNUMBER']),
               const Divider(),
-              _buildContactDetail('ACPL Focal Point', data['ACPLFOCALPOINTNAME'], data['ACPLFOCALPOINTNUMBER']),
+              _buildContactDetail('ACPL Focal Point', data['CPTFOCALPOINTNAME'], data['CPTFOCALPOINTNUMBER']),
             ],
           ),
         ),
@@ -63,11 +63,11 @@ class DetailsContainer extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            flex: 2,
+            flex: 5,
             child: Text(
-              '$label:',
+              '$label  ',
               style: TextStyle(
-                fontSize: 16 * textScaleFactor,
+                fontSize: 14 * textScaleFactor,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
@@ -78,7 +78,7 @@ class DetailsContainer extends StatelessWidget {
             child: Text(
               value ?? 'N/A',
               style: TextStyle(
-                fontSize: 18 * textScaleFactor,
+                fontSize: 14 * textScaleFactor,
               ),
               overflow: TextOverflow.ellipsis,
             ),
@@ -97,9 +97,9 @@ class DetailsContainer extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Text(
-              '$label:',
+              '$label  ',
               style: TextStyle(
-                fontSize: 16 * textScaleFactor,
+                fontSize: 13 * textScaleFactor,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
@@ -114,7 +114,7 @@ class DetailsContainer extends StatelessWidget {
                   Text(
                     name,
                     style: TextStyle(
-                      fontSize: 18 * textScaleFactor,
+                      fontSize: 14 * textScaleFactor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -126,7 +126,7 @@ class DetailsContainer extends StatelessWidget {
                       Text(
                         number,
                         style: TextStyle(
-                          fontSize: 18 * textScaleFactor,
+                          fontSize: 14 * textScaleFactor,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -134,7 +134,7 @@ class DetailsContainer extends StatelessWidget {
                         icon: Icon(
                           Icons.call,
                           color: Colors.green,
-                          size: 28 * textScaleFactor,
+                          size: 20 * textScaleFactor,
                         ),
                         onPressed: () => _makePhoneCall(number),
                       ),

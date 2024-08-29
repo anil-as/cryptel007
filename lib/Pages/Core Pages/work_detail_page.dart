@@ -264,6 +264,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                               children: [
                                 CustomButton(
                                   text: 'Work Status',
+                                  fsize: 16,
                                   onPressed: () {
                                     Navigator.push(
                                       context,
@@ -283,6 +284,8 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                 SizedBox(height: screenWidth * 0.02),
                                 CustomButton(
                                   text: 'Certification',
+                                                                    fsize: 16,
+
                                   onPressed: () {
                                     Navigator.push(
                                       context,
@@ -304,7 +307,9 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                     _userRole == 'Manager' ||
                                     _userRole == 'Editor')
                                   CustomButton(
-                                    text: 'Drawings',
+                                    text: 'Material Details',
+                                                                      fsize: 16,
+
                                     onPressed: () {
                                       Navigator.push(
                                         context,

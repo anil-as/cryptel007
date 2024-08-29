@@ -90,7 +90,7 @@ class _SpecificWorkPageState extends State<SpecificWorkPage> {
         title: Text(
           'Work Status',
           style: GoogleFonts.lato(
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.black87,
           ),
@@ -189,7 +189,7 @@ class _SpecificWorkPageState extends State<SpecificWorkPage> {
                                               child: Text(
                                                 name,
                                                 style: GoogleFonts.roboto(
-                                                  fontSize: 18,
+                                                  fontSize: 14,
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.black87,
                                                   letterSpacing: 1.2,
@@ -203,15 +203,15 @@ class _SpecificWorkPageState extends State<SpecificWorkPage> {
                                                 Text(
                                                   'Expected Delivery Date',
                                                   style: GoogleFonts.roboto(
-                                                    fontWeight: FontWeight.bold,
                                                     color: AppColors.logoblue,
+                                                    fontSize: 11
                                                   ),
                                                 ),
                                                 Text(
                                                   expectedDeliveryDate,
                                                   style: GoogleFonts.roboto(
                                                     fontWeight: FontWeight.bold,
-                                                    fontSize: 16,
+                                                    fontSize: 13,
                                                     color: Colors.black,
                                                   ),
                                                 ),
@@ -240,7 +240,7 @@ class _SpecificWorkPageState extends State<SpecificWorkPage> {
                                         Text(
                                           'Last Edited On: ${lastEdit.isNotEmpty ? lastEdit : 'Not Available'}',
                                           style: GoogleFonts.roboto(
-                                            fontSize: 14,
+                                            fontSize: 11,
                                             color: Colors.black54,
                                           ),
                                         ),
