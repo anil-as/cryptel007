@@ -20,8 +20,13 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController idController = TextEditingController();
   final TextEditingController quantityController = TextEditingController();
-  final TextEditingController completionController =
-      TextEditingController(text: '0');
+  final TextEditingController rawmaterialController = TextEditingController();
+  final TextEditingController rmsizeController = TextEditingController();
+  final TextEditingController rmcController = TextEditingController();
+  final TextEditingController machineController = TextEditingController();
+  final TextEditingController operatorController = TextEditingController();
+  final TextEditingController workcenterController = TextEditingController();
+  final TextEditingController drawingnumberController = TextEditingController();
   final TextEditingController expectedDeliveryDateController =
       TextEditingController();
   DateTime? selectedDate;
@@ -48,13 +53,43 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
   }
 
   Future<void> _pickImage() async {
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = File(pickedFile.path);
-      });
-    }
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await showDialog<XFile?>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          title: const Text(
+            'Select Image Source',
+            style: TextStyle(fontSize: 18),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                final XFile? pickedFile =
+                    await picker.pickImage(source: ImageSource.camera);
+                Navigator.pop(context, pickedFile);
+              },
+              child: const Text('Take Photo'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final XFile? pickedFile =
+                    await picker.pickImage(source: ImageSource.gallery);
+                Navigator.pop(context, pickedFile);
+              },
+              child: const Text('Choose from Gallery'),
+            ),
+          ],
+        );
+      },
+    );
+
+    setState(() {
+      _imageFile = image != null ? File(image.path) : null;
+    });
   }
 
   Future<String?> _uploadImage(String id) async {
@@ -81,8 +116,14 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
       final name = nameController.text;
       final id = idController.text;
       final quantity = quantityController.text;
-      final completion = completionController.text;
       final expectedDeliveryDate = expectedDeliveryDateController.text;
+      final rawmaterial = rawmaterialController.text;
+      final rmsize = rmsizeController.text;
+      final rmc = rmcController.text;
+      final machine = machineController.text;
+      final operators = operatorController.text;
+      final workcenter = workcenterController.text;
+      final drawingnumber = drawingnumberController;
 
       String? imageUrl = await _uploadImage(id);
 
@@ -95,10 +136,17 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
             .set({
           'name': name,
           'id': id,
+          'drawingnumber':drawingnumber,
+          'rawmaterial': rawmaterial,
+          'rmsize': rmsize,
+          'rmc': rmc,
+          'operator': operators,
+          'machine': machine,
+          'workcenter': workcenter,
           'quantity': quantity,
-          'completion': completion,
+          'completion': '0',
           'expectedDeliveryDate': expectedDeliveryDate,
-          'imageUrl': imageUrl, // Save image URL here
+          'imageUrl': imageUrl,
           'lastedit': '',
         });
 
@@ -108,7 +156,7 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
       } catch (e) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Error: $e')));
-      }finally{
+      } finally {
         setState(() {
           isLoading = false;
         });
@@ -143,155 +191,217 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Specify Work',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.logoblue,
-                    fontFamily: GoogleFonts.strait().fontFamily,
+    return SingleChildScrollView(
+      child: Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Specify Work',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.logoblue,
+                      fontFamily: GoogleFonts.strait().fontFamily,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: _pickImage,
-                          icon: const Icon(Icons.image),
-                          label: const Text('Pick Image'),
-                        ),
-                        if (_imageFile != null) ...[
-                          const SizedBox(height: 8),
-                          Image.file(
-                            _imageFile!,
-                            height: 200,
-                            width: MediaQuery.of(context).size.width * 0.7,
-                            fit: BoxFit.cover,
+                  const SizedBox(height: 16),
+                  Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: _pickImage,
+                            icon: const Icon(Icons.add_a_photo_rounded),
+                            label: const Text('Add Image'),
                           ),
-                        ],
-                        const SizedBox(height: 8),
-                        _buildTextField(
-                          'Name',
-                          nameController,
-                          suffixIcon: Icons.settings_outlined,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a name';
-                            }
-                            return null;
-                          },
-                        ),
-                        _buildTextField(
-                          'ID',
-                          idController,
-                          suffixIcon: Icons.tag,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter an ID';
-                            }
-                            return null;
-                          },
-                        ),
-                        _buildTextField(
-                          'Quantity',
-                          quantityController,
-                          keyboardType: TextInputType.number,
-                          suffixIcon: Icons.format_list_numbered,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a quantity';
-                            }
-                            if (int.tryParse(value) == null) {
-                              return 'Please enter a valid number';
-                            }
-                            return null;
-                          },
-                        ),
-                        _buildTextField(
-                          'Completion %',
-                          completionController,
-                          keyboardType: TextInputType.number,
-                          suffixIcon: Icons.percent,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter the completion percentage';
-                            }
-                            if (double.tryParse(value) == null ||
-                                double.tryParse(value)! < 0 ||
-                                double.tryParse(value)! > 100) {
-                              return 'Please enter a valid percentage between 0 and 100';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 8),
-                        GestureDetector(
-                          onTap: () => _selectDate(context),
-                          child: AbsorbPointer(
-                            child: _buildTextField(
-                              'Expected Delivery Date',
-                              expectedDeliveryDateController,
-                              keyboardType: TextInputType.datetime,
-                              readOnly: true,
-                              suffixIcon: Icons.calendar_today,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please select a delivery date';
-                                }
-                                return null;
-                              },
+                          if (_imageFile != null) ...[
+                            const SizedBox(height: 8),
+                            Image.file(
+                              _imageFile!,
+                              height: 200,
+                              width: MediaQuery.of(context).size.width * 0.7,
+                              fit: BoxFit.cover,
+                            ),
+                          ],
+                          const SizedBox(height: 8),
+                          _buildTextField(
+                            'ID',
+                            idController,
+                            suffixIcon: Icons.tag,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter an ID';
+                              }
+                              return null;
+                            },
+                          ),
+                          _buildTextField(
+                            'Name',
+                            nameController,
+                            suffixIcon: Icons.settings_outlined,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a name';
+                              }
+                              return null;
+                            },
+                          ),
+                          _buildTextField(
+                            'Drawing Number',
+                            drawingnumberController,
+                            suffixIcon: Icons.draw_rounded,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter Drawing Number';
+                              }
+                              return null;
+                            },
+                          ),
+                          _buildTextField(
+                            'Raw Material',
+                            rawmaterialController,
+                            suffixIcon: Icons.integration_instructions_outlined,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter the Raw Material';
+                              }
+                              return null;
+                            },
+                          ),
+                          _buildTextField(
+                            'Raw Material Size',
+                            rmsizeController,
+                            suffixIcon: Icons.photo_size_select_small_rounded,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter Material Specification';
+                              }
+                              return null;
+                            },
+                          ),
+                          _buildTextField(
+                            'RMC',
+                            rmcController,
+                            suffixIcon: Icons.note_outlined,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter RMC';
+                              }
+                              return null;
+                            },
+                          ),
+                          _buildTextField(
+                            'Machine',
+                            machineController,
+                            suffixIcon: Icons.devices_other,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter the Machine allotted';
+                              }
+                              return null;
+                            },
+                          ),
+                          _buildTextField(
+                            'Operator',
+                            operatorController,
+                            suffixIcon: Icons.engineering,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter Operators allotted';
+                              }
+                              return null;
+                            },
+                          ),
+                          _buildTextField(
+                            'Work Center',
+                            workcenterController,
+                            suffixIcon: Icons.factory,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter center allotted for this work operations';
+                              }
+                              return null;
+                            },
+                          ),
+                          _buildTextField(
+                            'Quantity',
+                            quantityController,
+                            keyboardType: TextInputType.number,
+                            suffixIcon: Icons.format_list_numbered,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a quantity';
+                              }
+                              if (int.tryParse(value) == null) {
+                                return 'Please enter a valid number';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 8),
+                          GestureDetector(
+                            onTap: () => _selectDate(context),
+                            child: AbsorbPointer(
+                              child: _buildTextField(
+                                'Expected Delivery Date',
+                                expectedDeliveryDateController,
+                                keyboardType: TextInputType.datetime,
+                                readOnly: true,
+                                suffixIcon: Icons.calendar_today,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please select a delivery date';
+                                  }
+                                  return null;
+                                },
+                              ),
                             ),
                           ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  if (isLoading)
+                    const CircularProgressIndicator()
+                  else
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                      child: ElevatedButton(
+                        onPressed: _saveWork,
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: AppColors.logoblue,
+                          minimumSize: const Size(400, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-               if(isLoading)
-               const CircularProgressIndicator()
-               else
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                  child: ElevatedButton(
-                    onPressed: _saveWork,
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: AppColors.logoblue,
-                      minimumSize: const Size(400, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        child: Text(
+                          'Save',
+                          style: TextStyle(
+                            fontFamily: GoogleFonts.strait().fontFamily,
+                            fontSize: 19,
+                          ),
+                        ),
                       ),
                     ),
-                    child: Text(
-                      'Save',
-                      style: TextStyle(
-                        fontFamily: GoogleFonts.strait().fontFamily,
-                        fontSize: 19,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
