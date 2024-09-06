@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:cryptel007/Pages/Core%20Pages/work_detail_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:cryptel007/Tools/custom_button.dart';
@@ -41,6 +42,21 @@ class _AddWorkPageState extends State<AddWorkPage> {
       _isLoading = true;
     });
 
+    // Check if the workOrderNumber already exists
+    final DocumentSnapshot existingWork = await FirebaseFirestore.instance
+        .collection('works')
+        .doc(_workOrderNumber)
+        .get();
+
+    if (existingWork.exists) {
+      _showSnackBar(
+          'Work Order Number already exists. Please use a unique number.');
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
     String? photoUrl;
 
     if (_photo != null) {
@@ -75,13 +91,7 @@ class _AddWorkPageState extends State<AddWorkPage> {
           .set(workData);
 
       _showSnackBar('Data successfully saved');
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              WorkDetailPage(workOrderNumber: _workOrderNumber),
-        ),
-      );
+      Navigator.popUntil(context, ModalRoute.withName('/home'));
     } catch (e) {
       _showSnackBar('Error saving data: $e');
     } finally {
@@ -223,10 +233,16 @@ class _AddWorkPageState extends State<AddWorkPage> {
               ),
             ),
           ),
-          if (_isLoading)
-            const Center(
-              child: CircularProgressIndicator(),
+           if (_isLoading)
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+            child: Container(
+              color: Colors.black.withOpacity(0.5),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
             ),
+          ),
         ],
       ),
     );
@@ -260,42 +276,44 @@ class _AddWorkPageState extends State<AddWorkPage> {
     );
   }
 
- Widget _buildTextField(
-  String label,
-  ValueChanged<String> onChanged, {
-  int maxLines = 1,
-  bool obscureText = false,
-  TextInputType keyboardType = TextInputType.text,
-  bool allowSpecialChars = true,
-}) {
-  return Container(
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12.0),
-      border: Border.all(color: Colors.grey),
-    ),
-    child: TextFormField(
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(
-          fontSize: 12,
-          color: Colors.grey[600],
-        ),
-        border: InputBorder.none,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+  Widget _buildTextField(
+    String label,
+    ValueChanged<String> onChanged, {
+    int maxLines = 1,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+    bool allowSpecialChars = true,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(color: Colors.grey),
       ),
-      maxLines: maxLines,
-      obscureText: obscureText,
-      onChanged: onChanged,
-      keyboardType: keyboardType,
-      inputFormatters: allowSpecialChars
-          ? [] // Allow all characters
-          : [FilteringTextInputFormatter.deny(RegExp(r'[/-]'))], // Allow no special chars
-      validator: (value) => value!.isEmpty ? 'Please enter the $label' : null,
-    ),
-  );
-}
+      child: TextFormField(
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+          ),
+          border: InputBorder.none,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        ),
+        maxLines: maxLines,
+        obscureText: obscureText,
+        onChanged: onChanged,
+        keyboardType: keyboardType,
+        inputFormatters: allowSpecialChars
+            ? [] // Allow all characters
+            : [
+                FilteringTextInputFormatter.deny(RegExp(r'[/-]'))
+              ], // Allow no special chars
+        validator: (value) => value!.isEmpty ? 'Please enter the $label' : null,
+      ),
+    );
+  }
 
   Widget _buildFocalPointFields() {
     return Row(

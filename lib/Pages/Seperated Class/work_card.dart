@@ -1,3 +1,4 @@
+import 'package:cryptel007/Pages/Seperated%20Class/pdf_upload_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -79,18 +80,30 @@ class _WorkCardState extends State<WorkCard> {
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.network(
                                   imageUrl,
-                                  height: 60,
-                                  width: 60,
+                                  height: 70,
+                                  width: 70,
                                   fit: BoxFit.cover,
                                 ),
                               ),
                             ),
                           if (imageUrl.isNotEmpty) const SizedBox(height: 10),
                           if (imageUrl.isNotEmpty)
-                            Image.asset(
-                              'assets/pdf.png',
-                              height: 60,
-                              width: 60,
+                            GestureDetector(  onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PdfUploadPage(
+                  workOrderNumber: '123456', // Pass required parameters
+                  workId: 'work-id',
+                ),
+              ),
+            );
+          },
+                              child: Image.asset(
+                                'assets/pdf.png',
+                                height: 70,
+                                width: 70,
+                              ),
                             )
                         ],
                       ),
@@ -137,14 +150,14 @@ class _WorkCardState extends State<WorkCard> {
                             Text(
                               'ID: $id',
                               style: GoogleFonts.roboto(
-                                fontSize: 16,
+                                fontSize: 13,
                                 color: Colors.black,
                               ),
                             ),
                             Text(
                               'Dwg No: $drawingnumber',
                               style: GoogleFonts.roboto(
-                                fontSize: 16,
+                                fontSize: 13,
                                 color: Colors.black,
                               ),
                             ),
@@ -226,6 +239,7 @@ class _WorkCardState extends State<WorkCard> {
           title,
           style: GoogleFonts.roboto(
             fontSize: 14,
+            fontWeight: FontWeight.bold,
             color: Colors.black87,
           ),
         ),

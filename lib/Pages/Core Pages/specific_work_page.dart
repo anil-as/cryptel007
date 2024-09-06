@@ -1,7 +1,7 @@
 
 import 'package:cryptel007/Pages/Core%20Pages/specific_work_edit_page.dart';
 import 'package:cryptel007/Pages/Core%20Pages/work_detail_page.dart';
-import 'package:cryptel007/Pages/Seperated%20Class/add_specific_work_dialog.dart';
+import 'package:cryptel007/Pages/Core%20Pages/add_specific_work_dialog.dart';
 import 'package:cryptel007/Pages/Seperated%20Class/photo_view_screen.dart';
 import 'package:cryptel007/Pages/Seperated%20Class/work_card.dart';
 import 'package:cryptel007/tools/user_role_service.dart';

@@ -123,7 +123,7 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
       final machine = machineController.text;
       final operators = operatorController.text;
       final workcenter = workcenterController.text;
-      final drawingnumber = drawingnumberController;
+      final drawingnumber = drawingnumberController.text;
 
       String? imageUrl = await _uploadImage(id);
 
