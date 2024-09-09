@@ -1,4 +1,5 @@
 import 'package:cryptel007/Pages/Navigation%20Pages/home_page.dart';
+import 'package:cryptel007/Pages/Navigation%20Pages/splash_screen.dart';
 import 'package:cryptel007/firebase_options.dart';
 import 'package:cryptel007/main_page.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -18,9 +19,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return  MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const MainPage(),
+      home: const SplashScreen(),
       routes: {
     '/home': (context) => const HomePage(),
+    '/main_page':(context) => const MainPage(),
     // Other routes
   },
     );

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cryptel007/Pages/Core%20Pages/login_page.dart';
 import 'package:cryptel007/Pages/Navigation%20Pages/home_page.dart';
+import 'package:cryptel007/Pages/Navigation%20Pages/splash_screen.dart';
 import 'package:cryptel007/Pages/Sub%20Pages/access_controlpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
