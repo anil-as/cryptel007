@@ -1,4 +1,3 @@
-import 'package:cryptel007/Pages/Seperated%20Class/pdf_upload_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,6 +23,7 @@ class WorkCard extends StatefulWidget {
 
 class _WorkCardState extends State<WorkCard> {
   bool _isExpanded = false;
+  final bool _isAllowed = false;
 
   @override
   void didChangeDependencies() {
@@ -87,24 +87,24 @@ class _WorkCardState extends State<WorkCard> {
                               ),
                             ),
                           if (imageUrl.isNotEmpty) const SizedBox(height: 10),
-                          if (imageUrl.isNotEmpty)
-                            GestureDetector(  onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PdfUploadPage(
-                  workOrderNumber: '123456', // Pass required parameters
-                  workId: 'work-id',
-                ),
-              ),
-            );
-          },
-                              child: Image.asset(
-                                'assets/pdf.png',
-                                height: 70,
-                                width: 70,
-                              ),
-                            )
+                         
+          //                   GestureDetector(  onTap: () {
+          //   Navigator.push(
+          //     context,
+          //     MaterialPageRoute(
+          //       builder: (context) => PdfUploadPage(
+          //         workOrderNumber: '123456', // Pass required parameters
+          //         workId: 'work-id',
+          //       ),
+          //     ),
+          //   );
+          // },
+          //                     child: Image.asset(
+          //                       'assets/pdf.png',
+          //                       height: 70,
+          //                       width: 70,
+          //                     ),
+          //                   )
                         ],
                       ),
                       const SizedBox(width: 16),
@@ -177,6 +177,7 @@ class _WorkCardState extends State<WorkCard> {
                     ],
                   ),
                 ),
+                if(_isAllowed)
                 Positioned(
                   right: 1,
                   bottom: 0.01,
@@ -197,7 +198,7 @@ class _WorkCardState extends State<WorkCard> {
                 ),
               ],
             ),
-            if (_isExpanded)
+            if (_isExpanded && _isAllowed)
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -254,14 +255,29 @@ class _WorkCardState extends State<WorkCard> {
     );
   }
 
-  Widget _buildPercentageIndicator(String completion) {
-    final double percentage = double.tryParse(completion) ?? 0;
+Widget _buildPercentageIndicator(String completion) {
+  final double percentage = double.tryParse(completion) ?? 0;
 
-    return LinearPercentIndicator(
+  // Define the progress color based on percentage value
+  Color getProgressColor(double percentage) {
+    if (percentage < 30) {
+      return Colors.red;
+    } else if (percentage < 60) {
+      return Colors.orange;
+    } else if (percentage < 80) {
+      return Colors.yellow;
+    } else {
+      return Colors.green;
+    }
+  }
+
+  return SizedBox(
+    width: double.infinity, // Increase the bar length to maximum width
+    child: LinearPercentIndicator(
       lineHeight: 25.0,
       percent: percentage / 100,
       backgroundColor: Colors.grey[200]!,
-      progressColor: AppColors.logoblue,
+      progressColor: getProgressColor(percentage), // Dynamic progress color
       center: Text(
         '${percentage.toStringAsFixed(1)}%',
         style: const TextStyle(
@@ -270,8 +286,10 @@ class _WorkCardState extends State<WorkCard> {
           color: Colors.white,
         ),
       ),
-      barRadius: const Radius.circular(12),
-      linearStrokeCap: LinearStrokeCap.roundAll,
-    );
-  }
+      barRadius: const Radius.circular(12), // Controls rounded corners
+    ),
+  );
+}
+
+
 }

@@ -34,8 +34,8 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
     _customerName = widget.data['CUSTOMERNAME'] ?? '';
     _focalPointName = widget.data['FOCALPOINTNAME'] ?? '';
     _focalPointNumber = widget.data['FOCALPOINTNUMBER'] ?? '';
-    _acplFocalPointName = widget.data['ACPLFOCALPOINTNAME'] ?? '';
-    _acplFocalPointNumber = widget.data['ACPLFOCALPOINTNUMBER'] ?? '';
+    _acplFocalPointName = widget.data['CPTFOCALPOINTNAME'] ?? '';
+    _acplFocalPointNumber = widget.data['CPTFOCALPOINTNUMBER'] ?? '';
   }
 
   Future<void> _updateDetails() async {
@@ -96,8 +96,8 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
             'CUSTOMERNAME': _customerName,
             'FOCALPOINTNAME': _focalPointName,
             'FOCALPOINTNUMBER': _focalPointNumber,
-            'ACPLFOCALPOINTNAME': _acplFocalPointName,
-            'ACPLFOCALPOINTNUMBER': _acplFocalPointNumber,
+            'CPTFOCALPOINTNAME': _acplFocalPointName,
+            'CPTFOCALPOINTNUMBER': _acplFocalPointNumber,
           });
 
       Navigator.of(context).pop();

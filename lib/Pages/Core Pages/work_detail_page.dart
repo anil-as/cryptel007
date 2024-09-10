@@ -6,7 +6,6 @@ import 'package:cryptel007/Pages/Seperated%20Class/work_header.dart';
 import 'package:cryptel007/Pages/Sub%20Pages/certification_page.dart';
 import 'package:cryptel007/Pages/Sub%20Pages/drawings_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
-import 'package:cryptel007/Tools/custom_button.dart';
 import 'package:cryptel007/Tools/user_role_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -21,6 +20,7 @@ class WorkDetailPage extends StatefulWidget {
 }
 
 class _WorkDetailPageState extends State<WorkDetailPage> {
+  final _isAllowed = false;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final UserRoleService _userRoleService = UserRoleService();
   String? _userRole;
@@ -262,83 +262,137 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                 horizontal: screenWidth * 0.04),
                             child: Column(
                               children: [
-                                CustomButton(
-                                  text: 'Work Status',
-                                  fsize: 16,
-                                  onPressed: () {
+                                GestureDetector(
+                                  onTap: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
                                               SpecificWorkPage(
-                                                workOrderNumber:
-                                                    data['WONUMBER'],
-                                              )),
+                                                  workOrderNumber:
+                                                      data['WONUMBER'])),
                                     );
                                   },
-                                  h: 47,
-                                  w: double.infinity,
-                                  buttonColor: Colors.yellow,
-                                  textColor: Colors.black,
+                                  child: Card(
+                                    color: Colors.yellow,
+                                    elevation: 5,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: const ListTile(
+                                      leading: Icon(Icons.work,
+                                          color: Colors.black, size: 30),
+                                      title: Text(
+                                        'Work Status',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
+                                if(_isAllowed)
                                 SizedBox(height: screenWidth * 0.02),
-                                CustomButton(
-                                  text: 'Certification',
-                                                                    fsize: 16,
-
-                                  onPressed: () {
+                                if(_isAllowed)
+                                GestureDetector(
+                                  onTap: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
                                               CertificationPage(
-                                                workOrderNumber:
-                                                    data['WONUMBER'],
-                                              )),
+                                                  workOrderNumber:
+                                                      data['WONUMBER'])),
                                     );
                                   },
-                                  h: 47,
-                                  w: double.infinity,
-                                  buttonColor: AppColors.lightblue,
-                                  textColor: Colors.black,
+                                  child: Card(
+                                    color: AppColors.lightblue,
+                                    elevation: 5,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: const ListTile(
+                                      leading: Icon(Icons.verified,
+                                          color: Colors.black, size: 30),
+                                      title: Text(
+                                        'Certification',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
+                                if(_isAllowed)
                                 SizedBox(height: screenWidth * 0.02),
+                                if(_isAllowed)
                                 if (_userRole == 'ADMIN' ||
                                     _userRole == 'Manager' ||
                                     _userRole == 'Editor')
-                                  CustomButton(
-                                    text: 'Material Details',
-                                                                      fsize: 16,
-
-                                    onPressed: () {
+                                  GestureDetector(
+                                    onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => DrawingsPage(
-                                                  workOrderNumber:
-                                                      data['WONUMBER'],
-                                                )),
+                                                workOrderNumber:
+                                                    data['WONUMBER'])),
                                       );
                                     },
-                                    h: 47,
-                                    w: double.infinity,
-                                    buttonColor: AppColors.accentText,
-                                    textColor: Colors.white,
+                                    child: Card(
+                                      color: AppColors.accentText,
+                                      elevation: 5,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: const ListTile(
+                                        leading: Icon(Icons.draw_rounded,
+                                            color: Colors.white, size: 30),
+                                        title: Text(
+                                          'Drawings Page',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ),
+                                  if(_isAllowed)
                                 SizedBox(height: screenWidth * 0.02),
+                                if(_isAllowed)
                                 if (_userRole == 'ADMIN' ||
                                     _userRole == 'Manager' ||
                                     _userRole == 'Editor')
-                                  CustomButton(
-                                    text: 'Delete this Work',
-                                    onPressed: () async {
+                                  GestureDetector(
+                                    onTap: () async {
                                       await _confirmAndDeleteWorkOrder(
                                           data['WONUMBER']);
                                     },
-                                    h: 47,
-                                    w: double.infinity,
-                                    buttonColor:Colors.red,
-                                    textColor: Colors.white,
+                                    child: Card(
+                                      color: Colors.red,
+                                      elevation: 5,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: const ListTile(
+                                        leading: Icon(Icons.delete,
+                                            color: Colors.white, size: 30),
+                                        title: const Text(
+                                          'Delete this Work',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ),
                               ],
                             ),
