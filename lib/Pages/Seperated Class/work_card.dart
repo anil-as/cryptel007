@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class WorkCard extends StatefulWidget {
@@ -24,12 +26,44 @@ class WorkCard extends StatefulWidget {
 class _WorkCardState extends State<WorkCard> {
   bool _isExpanded = false;
   final bool _isAllowed = false;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  String? _userRole;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Reset _isExpanded to false when the widget is rebuilt
     _isExpanded = false;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) {
+      _fetchUserRole(account?.email);
+    });
+    _googleSignIn.signInSilently();
+  }
+
+  Future<void> _fetchUserRole(String? email) async {
+    if (email == null) return;
+
+    try {
+      // Fetch the user role from Firestore
+      DocumentSnapshot userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(email).get();
+
+      if (userDoc.exists) {
+        setState(() {
+          _userRole = userDoc[
+              'role']; // Assuming 'role' is a field in your Firestore user document
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to fetch user role: $e')),
+      );
+    }
   }
 
   @override
@@ -87,24 +121,35 @@ class _WorkCardState extends State<WorkCard> {
                               ),
                             ),
                           if (imageUrl.isNotEmpty) const SizedBox(height: 10),
-                         
-          //                   GestureDetector(  onTap: () {
-          //   Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //       builder: (context) => PdfUploadPage(
-          //         workOrderNumber: '123456', // Pass required parameters
-          //         workId: 'work-id',
-          //       ),
-          //     ),
-          //   );
-          // },
-          //                     child: Image.asset(
-          //                       'assets/pdf.png',
-          //                       height: 70,
-          //                       width: 70,
-          //                     ),
-          //                   )
+
+                          //                   GestureDetector(  onTap: () {
+                          //   Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //       builder: (context) => PdfUploadPage(
+                          //         workOrderNumber: '123456', // Pass required parameters
+                          //         workId: 'work-id',
+                          //       ),
+                          //     ),
+                          //   );
+                          // },
+                          //                     child: Image.asset(
+                          //                       'assets/pdf.png',
+                          //                       height: 70,
+                          //                       width: 70,
+                          //                     ),
+                          //                   )
+                          if (_userRole == 'ADMIN' ||
+                              _userRole == 'Manager' ||
+                              _userRole == 'Editor')
+                            GestureDetector(
+                              onTap: widget.onEdit,
+                              child: Image.asset(
+                                'assets/edit.png',
+                                height: 43,
+                                width: 43,
+                              ),
+                            )
                         ],
                       ),
                       const SizedBox(width: 16),
@@ -155,7 +200,7 @@ class _WorkCardState extends State<WorkCard> {
                               ),
                             ),
                             Text(
-                              'Dwg No: $drawingnumber',
+                              'Quantity: $quantity',
                               style: GoogleFonts.roboto(
                                 fontSize: 13,
                                 color: Colors.black,
@@ -177,25 +222,25 @@ class _WorkCardState extends State<WorkCard> {
                     ],
                   ),
                 ),
-                if(_isAllowed)
-                Positioned(
-                  right: 1,
-                  bottom: 0.01,
-                  child: IconButton(
-                    icon: Icon(
-                      _isExpanded
-                          ? Icons.keyboard_arrow_up_rounded
-                          : Icons.keyboard_arrow_down_rounded,
-                      color: Colors.black,
-                      size: 34,
+                if (_isAllowed)
+                  Positioned(
+                    right: 1,
+                    bottom: 0.01,
+                    child: IconButton(
+                      icon: Icon(
+                        _isExpanded
+                            ? Icons.keyboard_arrow_up_rounded
+                            : Icons.keyboard_arrow_down_rounded,
+                        color: Colors.black,
+                        size: 34,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isExpanded = !_isExpanded;
+                        });
+                      },
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _isExpanded = !_isExpanded;
-                      });
-                    },
                   ),
-                ),
               ],
             ),
             if (_isExpanded && _isAllowed)
@@ -255,41 +300,39 @@ class _WorkCardState extends State<WorkCard> {
     );
   }
 
-Widget _buildPercentageIndicator(String completion) {
-  final double percentage = double.tryParse(completion) ?? 0;
+  Widget _buildPercentageIndicator(String completion) {
+    final double percentage = double.tryParse(completion) ?? 0;
 
-  // Define the progress color based on percentage value
-  Color getProgressColor(double percentage) {
-    if (percentage < 30) {
-      return Colors.red;
-    } else if (percentage < 60) {
-      return Colors.orange;
-    } else if (percentage < 80) {
-      return Colors.yellow;
-    } else {
-      return Colors.green;
+    // Define the progress color based on percentage value
+    Color getProgressColor(double percentage) {
+      if (percentage < 30) {
+        return Colors.red;
+      } else if (percentage < 60) {
+        return Colors.orange;
+      } else if (percentage < 80) {
+        return Colors.yellow;
+      } else {
+        return Colors.green;
+      }
     }
-  }
 
-  return SizedBox(
-    width: double.infinity, // Increase the bar length to maximum width
-    child: LinearPercentIndicator(
-      lineHeight: 25.0,
-      percent: percentage / 100,
-      backgroundColor: Colors.grey[200]!,
-      progressColor: getProgressColor(percentage), // Dynamic progress color
-      center: Text(
-        '${percentage.toStringAsFixed(1)}%',
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
+    return SizedBox(
+      width: double.infinity, // Increase the bar length to maximum width
+      child: LinearPercentIndicator(
+        lineHeight: 25.0,
+        percent: percentage / 100,
+        backgroundColor: Colors.grey[200]!,
+        progressColor: getProgressColor(percentage), // Dynamic progress color
+        center: Text(
+          '${percentage.toStringAsFixed(1)}%',
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
+        barRadius: const Radius.circular(12), // Controls rounded corners
       ),
-      barRadius: const Radius.circular(12), // Controls rounded corners
-    ),
-  );
-}
-
-
+    );
+  }
 }
