@@ -1,4 +1,5 @@
 import 'package:cryptel007/Tools/colors.dart';
+import 'package:cryptel007/Tools/edit_photo_page.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -161,7 +162,29 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
                 initialValue: _acplFocalPointNumber,
                 onSaved: (value) => _acplFocalPointNumber = value ?? '',
               ),
+               ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => EditPhotoPage(
+                      workOrderNumber: widget.workOrderNumber,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.photo_camera),
+              label: const Text('Edit Photo'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            ),
+          
+        
+      
             ],
+            
           ),
         ),
       ),

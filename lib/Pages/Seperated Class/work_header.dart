@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:cryptel007/Tools/edit_detailsdialog_box.dart';
+import 'package:cryptel007/Tools/edit_photo_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
@@ -143,19 +144,41 @@ class _WorkHeaderState extends State<WorkHeader> {
                         ],
                       ),
                     ),
-                    ClipOval(
-                      child: widget.workPhoto != null
-                          ? Image.network(
-                              widget.workPhoto!,
-                              width: 70.0,
-                              height: 70.0,
-                              fit: BoxFit.cover,
-                            )
-                          : Icon(
-                              Icons.photo,
-                              size: 100.0,
-                              color: Colors.grey[600],
+                    GestureDetector(
+                      onTap: () {
+                        if (_userRole == 'ADMIN' ||
+                            _userRole == 'Editor' ||
+                            _userRole == 'Manager') {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => EditPhotoPage(
+                                workOrderNumber: widget.workOrderNumber,
+                              ),
                             ),
+                          );
+                        } else {
+                          // Optionally, show a message or handle non-admin users
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Access denied. Admins only.'),
+                            ),
+                          );
+                        }
+                      },
+                      child: ClipOval(
+                        child: widget.workPhoto != null
+                            ? Image.network(
+                                widget.workPhoto!,
+                                width: 70.0,
+                                height: 70.0,
+                                fit: BoxFit.cover,
+                              )
+                            : Icon(
+                                Icons.photo,
+                                size: 100.0,
+                                color: Colors.grey[600],
+                              ),
+                      ),
                     ),
                   ],
                 ),
@@ -163,19 +186,19 @@ class _WorkHeaderState extends State<WorkHeader> {
             ),
           ),
         ),
-        if(_userRole == 'ADMIN')
-        Positioned(
-          bottom: widget.screenWidth * 0.04,
-          right: widget.screenWidth * 0.04,
-          child: GestureDetector(
-              onTap: () => _showEditDialog(context),
-              child: Image.asset(
-                'assets/edit.png',
-                width: 24,
-                height: 14,
-                color: Colors.white,
-              )),
-        ),
+        if (_userRole == 'ADMIN')
+          Positioned(
+            bottom: widget.screenWidth * 0.04,
+            right: widget.screenWidth * 0.04,
+            child: GestureDetector(
+                onTap: () => _showEditDialog(context),
+                child: Image.asset(
+                  'assets/edit.png',
+                  width: 24,
+                  height: 14,
+                  color: Colors.white,
+                )),
+          ),
       ],
     );
   }
