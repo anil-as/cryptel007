@@ -1,4 +1,5 @@
 
+import 'package:cryptel007/Pages/Core%20Pages/materials_page.dart';
 import 'package:cryptel007/Pages/Core%20Pages/specific_work_edit_page.dart';
 import 'package:cryptel007/Pages/Core%20Pages/work_detail_page.dart';
 import 'package:cryptel007/Pages/Core%20Pages/add_specific_work_dialog.dart';
@@ -71,6 +72,17 @@ class _SpecificWorkPageState extends State<SpecificWorkPage> {
       ),
     );
   }
+    void _navigateToMaterialPage(String workId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => StatusPage(
+          workOrderNumber: widget.workOrderNumber,
+          specificWorkId: workId,
+        ),
+      ),
+    );
+  }
 
   void _viewImage(String imageUrl) {
     Navigator.push(
@@ -137,6 +149,7 @@ class _SpecificWorkPageState extends State<SpecificWorkPage> {
                     return WorkCard(
                       doc: doc,
                       onEdit: () => _navigateToEditPage(doc['id']),
+                      onTaap: () => _navigateToMaterialPage(doc['id']),
                       onViewImage: () => _viewImage(doc['imageUrl']),
                       itemNumber: index + 1,
                     );

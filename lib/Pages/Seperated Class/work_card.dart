@@ -8,6 +8,7 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 class WorkCard extends StatefulWidget {
   final dynamic doc;
   final VoidCallback onEdit;
+  final VoidCallback onTaap;
   final VoidCallback onViewImage;
   final int itemNumber;
 
@@ -15,6 +16,7 @@ class WorkCard extends StatefulWidget {
     super.key,
     required this.doc,
     required this.onEdit,
+    required this.onTaap,
     required this.onViewImage,
     required this.itemNumber,
   });
@@ -84,7 +86,7 @@ class _WorkCardState extends State<WorkCard> {
     final drawingnumber = widget.doc['drawingnumber'] ?? '';
 
     return GestureDetector(
-      onTap: widget.onEdit,
+      onTap: widget.onTaap,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         decoration: BoxDecoration(

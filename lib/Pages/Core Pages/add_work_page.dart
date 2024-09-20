@@ -91,7 +91,14 @@ class _AddWorkPageState extends State<AddWorkPage> {
           .set(workData);
 
       _showSnackBar('Data successfully saved');
-      Navigator.popUntil(context, ModalRoute.withName('/home'));
+       Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => WorkDetailPage(
+              workOrderNumber: _workOrderNumber,
+            ),
+          ),
+        );
     } catch (e) {
       _showSnackBar('Error saving data: $e');
     } finally {
@@ -237,7 +244,7 @@ class _AddWorkPageState extends State<AddWorkPage> {
           BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
             child: Container(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.white.withOpacity(0.5),
               child: const Center(
                 child: CircularProgressIndicator(),
               ),

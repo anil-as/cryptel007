@@ -57,6 +57,29 @@ class _BookmarkPageState extends State<BookmarkPage> {
     }
   }
 
+  Future<void> _removeBookmark(String email, String workOrderNumber) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(email)
+          .collection('bookmarks')
+          .doc(workOrderNumber)
+          .delete();
+      setState(() {
+        _bookmarkedWorks.removeWhere(
+            (doc) => (doc.data() as Map<String, dynamic>)['workOrderNumber'] == workOrderNumber);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Bookmark removed successfully')),
+      );
+    } catch (e) {
+      print('Error removing bookmark: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to remove bookmark')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -184,13 +207,30 @@ class _BookmarkPageState extends State<BookmarkPage> {
                                     ),
                                   ),
                                   const Spacer(),
-                                  Align(
-                                    alignment: Alignment.bottomRight,
-                                    child: Icon(
-                                      Icons.arrow_forward_ios,
-                                      color: Colors.white.withOpacity(0.9),
-                                      size: 22,
-                                    ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          color: Colors.white,
+                                        ),
+                                        onPressed: () async {
+                                          final GoogleSignInAccount? user =
+                                              _googleSignIn.currentUser;
+                                          if (user != null) {
+                                            await _removeBookmark(
+                                                user.email!, workOrderNumber);
+                                          }
+                                        },
+                                      ),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        color: Colors.white.withOpacity(0.9),
+                                        size: 22,
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
