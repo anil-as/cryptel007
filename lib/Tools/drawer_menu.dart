@@ -121,7 +121,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                   ),
                 ),
               ),
-              
+
               Center(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 17, left: 7, right: 7),
@@ -170,6 +170,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                   ),
                 ),
               ),
+
               if (_userRole == 'ADMIN' ||
                   _userRole == 'Manager' ||
                   _userRole == 'Editor')
@@ -195,6 +196,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                     color: Colors.white,
                   ),
                 ),
+
               if (_userRole == 'ADMIN')
                 ListTile(
                   onTap: () {
@@ -214,6 +216,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                 ),
+
               ListTile(
                 onTap: () {
                   Navigator.push(
@@ -232,6 +235,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
               ),
+
               ListTile(
                 onTap: () {
                   Navigator.push(
@@ -249,6 +253,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
               ),
+
               ListTile(
                 onTap: _showLogoutDialog,
                 leading: Image.asset(
@@ -259,6 +264,20 @@ class _DrawerMenuState extends State<DrawerMenu> {
                 title: const Text(
                   'Logout',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+              ),
+
+              // Developer Credit
+               const Padding(
+                padding: EdgeInsets.symmetric(vertical: 70.0),
+                child: Text(
+                  'Developed by ANIL A S',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ],
