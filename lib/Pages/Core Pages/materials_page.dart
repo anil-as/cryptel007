@@ -33,13 +33,12 @@ class _StatusPageState extends State<StatusPage> {
     if (email == null) return;
 
     try {
-      // Fetch the user role from Firestore
       DocumentSnapshot userDoc =
           await FirebaseFirestore.instance.collection('users').doc(email).get();
 
       if (userDoc.exists) {
         setState(() {
-          _userRole = userDoc['role']; // Assuming 'role' is a field in your Firestore user document
+          _userRole = userDoc['role'];
         });
       }
     } catch (e) {
@@ -63,6 +62,8 @@ class _StatusPageState extends State<StatusPage> {
     {"title": "SURFACE TREATMENT", "status": "Not Started"},
     {"title": "VISUAL INSPECTION", "status": "Not Started"},
     {"title": "DELIVERY", "status": "Not Started"},
+    {"title": "AGEING", "status": "Not Started"},
+    {"title": "WIRE CUT", "status": "Not Started"},
   ];
 
   // List of possible statuses
@@ -71,20 +72,20 @@ class _StatusPageState extends State<StatusPage> {
     'Progressing',
     'On Hold',
     'Completed',
+    'Not Required',
   ];
 
   // Assign colors for each status
   Map<String, Color> statusColors = {
     'Not Started': Colors.grey,
-    'Progressing': Colors.green,
-    'On Hold': Colors.yellow,
-    'Completed': Colors.blue,
+    'Progressing': Colors.blue,
+    'On Hold': Colors.orangeAccent,
+    'Completed': Colors.green,
+    'Not Required': Colors.red,
   };
 
-  // Firestore instance
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  // Method to save the status of a task to Firestore
   Future<void> _saveTaskStatus(String taskTitle, String status) async {
     try {
       await firestore
@@ -92,7 +93,7 @@ class _StatusPageState extends State<StatusPage> {
           .doc(widget.workOrderNumber)
           .collection('specificWorks')
           .doc(widget.specificWorkId)
-          .collection('tasks') // Subcollection for each task's status
+          .collection('tasks')
           .doc(taskTitle)
           .set({
         'title': taskTitle,
@@ -104,7 +105,6 @@ class _StatusPageState extends State<StatusPage> {
     }
   }
 
-  // Stream to get real-time data from Firestore
   Stream<QuerySnapshot> _getTasksStream() {
     return firestore
         .collection('works')
@@ -115,26 +115,30 @@ class _StatusPageState extends State<StatusPage> {
         .snapshots();
   }
 
-  // Merge Firestore data with local task list
   List<Map<String, dynamic>> _mergeTasks(List<DocumentSnapshot> firestoreTasks) {
-    // Create a map from Firestore tasks
     Map<String, String> firestoreTaskMap = {
       for (var task in firestoreTasks)
         (task.data() as Map<String, dynamic>)['title']: (task.data() as Map<String, dynamic>)['status']
     };
 
-    // Update the local tasks list with Firestore data
     return tasks.map((localTask) {
       return {
         'title': localTask['title'],
-        'status': firestoreTaskMap[localTask['title']] ?? localTask['status'], // Use Firestore status if available
+        'status': firestoreTaskMap[localTask['title']] ?? localTask['status'],
       };
     }).toList();
   }
 
-  // Check if the user has permission to change status
   bool _canChangeStatus() {
     return _userRole == 'ADMIN' || _userRole == 'Editor' || _userRole == 'Manager';
+  }
+
+  bool _shouldShowTask(String status) {
+    // If the status is 'Not Required' and the user does not have the required role, hide the task
+    if (status == 'Not Required') {
+      return _canChangeStatus();
+    }
+    return true;
   }
 
   @override
@@ -154,18 +158,16 @@ class _StatusPageState extends State<StatusPage> {
             return const Center(child: Text('No tasks available'));
           }
 
-          // List of tasks fetched from Firestore
           List<DocumentSnapshot> firestoreTasks = snapshot.data!.docs;
-
-          // Merge Firestore tasks with local tasks
           List<Map<String, dynamic>> mergedTasks = _mergeTasks(firestoreTasks);
 
           return ListView.builder(
             itemCount: mergedTasks.length,
             itemBuilder: (context, index) {
-              // Extracting task title and status
               String taskTitle = mergedTasks[index]['title'];
               String taskStatus = mergedTasks[index]['status'];
+
+              if (!_shouldShowTask(taskStatus)) return SizedBox.shrink();
 
               return Card(
                 margin: const EdgeInsets.all(8.0),
@@ -177,7 +179,7 @@ class _StatusPageState extends State<StatusPage> {
                           dropdownColor: Colors.white,
                           onChanged: (String? newValue) {
                             if (newValue != null) {
-                              _saveTaskStatus(taskTitle, newValue); // Save new status
+                              _saveTaskStatus(taskTitle, newValue);
                             }
                           },
                           items: statuses.map<DropdownMenuItem<String>>((String value) {
@@ -186,7 +188,7 @@ class _StatusPageState extends State<StatusPage> {
                               child: Text(
                                 value,
                                 style: TextStyle(
-                                  color: statusColors[value], // Color the text
+                                  color: statusColors[value],
                                 ),
                               ),
                             );
@@ -195,7 +197,8 @@ class _StatusPageState extends State<StatusPage> {
                       : Text(
                           taskStatus,
                           style: TextStyle(
-                            color: statusColors[taskStatus], // Display status in appropriate color
+                            fontSize: 18,
+                            color: statusColors[taskStatus],
                           ),
                         ),
                 ),
