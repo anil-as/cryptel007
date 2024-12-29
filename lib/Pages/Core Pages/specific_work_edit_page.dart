@@ -79,8 +79,7 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
         workcenterController.text = data['workcenter'] ?? '';
         operatorController.text = data['operator'] ?? '';
         drawingnumberController.text = data['drawingnumber'] ?? '';
-        _expectedDate = DateTime.tryParse(data['expectedDeliveryDate'] ?? '') ??
-            DateTime.now();
+        _expectedDate = DateTime.tryParse(data['expectedDeliveryDate'] ?? '') ?? DateTime.now();
         _completion = double.tryParse(data['completion'] ?? '0') ?? 0.0;
         _completionController.text = _completion.toString();
         _expectedDateController.text =
@@ -120,8 +119,7 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
         'rmc': rmcController.text,
         'machine': machineController.text,
         'workcenter': workcenterController.text,
-        'expectedDeliveryDate':
-            DateFormat('dd-MMMM-yyyy').format(_expectedDate),
+        'expectedDeliveryDate': DateFormat('dd-MMMM-yyyy').format(_expectedDate),
         'completion': _completion.toString(),
         'lastedit': DateFormat('dd-MMMM-yyyy HH:mm:ss').format(DateTime.now()),
         'imageUrl': _imageUrl,
@@ -169,8 +167,7 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.save, color: Colors.green),
-            onPressed: () =>
-                showSaveConfirmationDialog(context, _updateWorkDetails),
+            onPressed: () => showSaveConfirmationDialog(context, _updateWorkDetails),
             color: AppColors.logoblue,
           ),
           IconButton(
@@ -220,16 +217,15 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
                         controller: drawingnumberController,
                         label: 'Drawing Number',
                         hint: 'Enter Drawing Number'),
-                          TextFieldWidget(
+                    TextFieldWidget(
                         controller: operatorController,
                         label: 'Operators',
                         hint: 'Enter Operators allotted'),
                     TextFieldWidget(
                         controller: workcenterController,
                         label: 'Work Center',
-                        hint: 'Enter Operating Center'),const SizedBox(
-                      height: 10,
-                    ),
+                        hint: 'Enter Operating Center'),
+                    const SizedBox(height: 10),
                     DateField(
                       controller: _expectedDateController,
                       initialDate: _expectedDate,
@@ -241,9 +237,25 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
                         });
                       },
                     ),
-                    const SizedBox(
-                      height: 25,
+                    const SizedBox(height: 25),
+                    // Quantity Field with Manual Input
+                    TextFormField(
+                      controller: _quantityController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Quantity',
+                        hintText: 'Enter quantity manually',
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          _quantity = int.tryParse(value) ?? 0;
+                        });
+                      },
                     ),
+                    const SizedBox(height: 15),
+                    // Wider Quantity Selector
                     QuantityField(
                       quantity: _quantity,
                       onDecrease: () {
@@ -259,9 +271,8 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
                         _quantityController.text = _quantity.toString();
                       },
                     ),
-                    const SizedBox(
-                      height: 15,
-                    ),
+                    const SizedBox(height: 15),
+                    // Percentage Selector with Wider Input
                     PercentageSelector(
                       completion: _completion,
                       onChanged: (value) {

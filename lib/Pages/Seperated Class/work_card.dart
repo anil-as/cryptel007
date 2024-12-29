@@ -26,7 +26,7 @@ class WorkCard extends StatefulWidget {
 }
 
 class _WorkCardState extends State<WorkCard> {
-  bool _isExpanded = true;
+  bool _isExpanded = false;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   String? _userRole;
 
