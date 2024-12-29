@@ -26,8 +26,7 @@ class WorkCard extends StatefulWidget {
 }
 
 class _WorkCardState extends State<WorkCard> {
-  bool _isExpanded = false;
-  final bool _isAllowed = false;
+  bool _isExpanded = true;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   String? _userRole;
 
@@ -57,8 +56,7 @@ class _WorkCardState extends State<WorkCard> {
 
       if (userDoc.exists) {
         setState(() {
-          _userRole = userDoc[
-              'role']; // Assuming 'role' is a field in your Firestore user document
+          _userRole = userDoc['role']; // Assuming 'role' is a field in your Firestore user document
         });
       }
     } catch (e) {
@@ -79,7 +77,7 @@ class _WorkCardState extends State<WorkCard> {
     final rmsize = widget.doc['rmsize'] ?? '';
     final rmc = widget.doc['rmc'] ?? '';
     final machine = widget.doc['machine'] ?? '';
-    final operators = widget.doc['operator'] ?? '';
+    final operator = widget.doc['operator'] ?? '';
     final workcenter = widget.doc['workcenter'] ?? '';
     final lastEdit = widget.doc['lastedit'] ?? '';
     final imageUrl = widget.doc['imageUrl'] ?? '';
@@ -109,6 +107,7 @@ class _WorkCardState extends State<WorkCard> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const SizedBox(height: 18),
                           if (imageUrl.isNotEmpty)
                             GestureDetector(
                               onTap: widget.onViewImage,
@@ -123,35 +122,32 @@ class _WorkCardState extends State<WorkCard> {
                               ),
                             ),
                           if (imageUrl.isNotEmpty) const SizedBox(height: 10),
-
-                          //                   GestureDetector(  onTap: () {
-                          //   Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //       builder: (context) => PdfUploadPage(
-                          //         workOrderNumber: '123456', // Pass required parameters
-                          //         workId: 'work-id',
-                          //       ),
-                          //     ),
-                          //   );
-                          // },
-                          //                     child: Image.asset(
-                          //                       'assets/pdf.png',
-                          //                       height: 70,
-                          //                       width: 70,
-                          //                     ),
-                          //                   )
-                          if (_userRole == 'ADMIN' ||
-                              _userRole == 'Manager' ||
-                              _userRole == 'Editor')
-                            GestureDetector(
-                              onTap: widget.onEdit,
-                              child: Image.asset(
-                                'assets/edit.png',
-                                height: 43,
-                                width: 43,
-                              ),
-                            )
+                          Column(
+                            children: [
+                              if (_userRole == 'ADMIN' ||
+                                  _userRole == 'Manager' ||
+                                  _userRole == 'Editor')
+                                GestureDetector(
+                                  onTap: widget.onEdit,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 6, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Text(
+                                      'Edit Details',
+                                      style: GoogleFonts.lato(
+                                        fontSize: 12,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ],
                       ),
                       const SizedBox(width: 16),
@@ -202,9 +198,10 @@ class _WorkCardState extends State<WorkCard> {
                               ),
                             ),
                             Text(
-                              'Quantity: $quantity',
+                              'Drawing No: $drawingnumber',
                               style: GoogleFonts.roboto(
                                 fontSize: 13,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                             ),
@@ -224,28 +221,27 @@ class _WorkCardState extends State<WorkCard> {
                     ],
                   ),
                 ),
-                if (_isAllowed)
-                  Positioned(
-                    right: 1,
-                    bottom: 0.01,
-                    child: IconButton(
-                      icon: Icon(
-                        _isExpanded
-                            ? Icons.keyboard_arrow_up_rounded
-                            : Icons.keyboard_arrow_down_rounded,
-                        color: Colors.black,
-                        size: 34,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _isExpanded = !_isExpanded;
-                        });
-                      },
+                Positioned(
+                  right: 2,
+                  bottom: 0.01,
+                  child: IconButton(
+                    icon: Icon(
+                      _isExpanded
+                          ? Icons.keyboard_arrow_up_rounded
+                          : Icons.keyboard_arrow_down_rounded,
+                      color: Colors.white,
+                      size: 27
                     ),
+                    onPressed: () {
+                      setState(() {
+                        _isExpanded = !_isExpanded;
+                      });
+                    },
                   ),
+                ),
               ],
             ),
-            if (_isExpanded && _isAllowed)
+            if (_isExpanded)
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -268,7 +264,7 @@ class _WorkCardState extends State<WorkCard> {
                     _buildDetailRow('Size', rmsize),
                     _buildDetailRow('RMC', rmc),
                     _buildDetailRow('Machine', machine),
-                    _buildDetailRow('Operator', operators),
+                    _buildDetailRow('Operator', operator),
                     _buildDetailRow('Work Center', workcenter),
                   ],
                 ),
@@ -305,15 +301,13 @@ class _WorkCardState extends State<WorkCard> {
   Widget _buildPercentageIndicator(String completion) {
     final double percentage = double.tryParse(completion) ?? 0;
 
-    
-
     return SizedBox(
       width: double.infinity, // Increase the bar length to maximum width
       child: LinearPercentIndicator(
         lineHeight: 25.0,
         percent: percentage / 100,
         backgroundColor: Colors.grey[200]!,
-        progressColor:  Colors.green, // Dynamic progress color
+        progressColor: Colors.green, // Dynamic progress color
         center: Text(
           '${percentage.toStringAsFixed(1)}%',
           style: const TextStyle(

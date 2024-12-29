@@ -123,6 +123,7 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
       final machine = machineController.text;
       final workcenter = workcenterController.text;
       final drawingnumber = drawingnumberController.text;
+      final operator = operatorController.text;
 
       String? imageUrl = await _uploadImage(id);
 
@@ -140,6 +141,7 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
           'rmsize': rmsize,
           'rmc': rmc,
           'drawingno': drawingnumber,
+          'operator':operator,
           'machine': machine,
           'workcenter': workcenter,
           'quantity': quantity,
@@ -266,6 +268,17 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter Drawing Number';
+                              }
+                              return null;
+                            },
+                          ),
+                           _buildTextField(
+                            'Operators',
+                            operatorController,
+                            suffixIcon: Icons.man,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter Operators allotted';
                               }
                               return null;
                             },
