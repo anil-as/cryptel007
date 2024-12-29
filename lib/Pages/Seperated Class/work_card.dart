@@ -305,18 +305,7 @@ class _WorkCardState extends State<WorkCard> {
   Widget _buildPercentageIndicator(String completion) {
     final double percentage = double.tryParse(completion) ?? 0;
 
-    // Define the progress color based on percentage value
-    Color getProgressColor(double percentage) {
-      if (percentage < 30) {
-        return Colors.red;
-      } else if (percentage < 60) {
-        return Colors.orange;
-      } else if (percentage < 80) {
-        return Colors.yellow;
-      } else {
-        return Colors.green;
-      }
-    }
+    
 
     return SizedBox(
       width: double.infinity, // Increase the bar length to maximum width
@@ -324,13 +313,13 @@ class _WorkCardState extends State<WorkCard> {
         lineHeight: 25.0,
         percent: percentage / 100,
         backgroundColor: Colors.grey[200]!,
-        progressColor: getProgressColor(percentage), // Dynamic progress color
+        progressColor:  Colors.green, // Dynamic progress color
         center: Text(
           '${percentage.toStringAsFixed(1)}%',
           style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Colors.black,
           ),
         ),
         barRadius: const Radius.circular(12), // Controls rounded corners
