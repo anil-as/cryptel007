@@ -7,6 +7,7 @@ import 'package:cryptel007/Pages/Sub%20Pages/certification_page.dart';
 import 'package:cryptel007/Pages/Sub%20Pages/drawings_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
 import 'package:cryptel007/Tools/user_role_service.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -95,82 +96,96 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
     });
   }
 
-  Future<void> _confirmAndDeleteWorkOrder(String workOrderNumber) async {
-    bool shouldDelete = await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Work Order'),
-        content: const Text(
-            'Are you sure you want to delete this work order? This action cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false); // Cancel deletion
-            },
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(true); // Confirm deletion
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
+Future<void> _confirmAndDeleteWorkOrder(String workOrderNumber) async {
+  bool shouldDelete = await showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Delete Work Order'),
+      content: const Text(
+          'Are you sure you want to delete this work order? This action cannot be undone.'),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(false); // Cancel deletion
+          },
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(true); // Confirm deletion
+          },
+          child: const Text('Delete'),
+        ),
+      ],
+    ),
+  );
 
-    if (shouldDelete == true) {
-      setState(() {
-        _isLoading = true; // Show loading icon
-      });
+  if (shouldDelete == true) {
+    setState(() {
+      _isLoading = true; // Show loading icon
+    });
 
-      try {
-        // Delete the work order document
-        final workOrderRef =
-            FirebaseFirestore.instance.collection('works').doc(workOrderNumber);
+    try {
+      // Delete the work order document
+      final workOrderRef =
+          FirebaseFirestore.instance.collection('works').doc(workOrderNumber);
 
-        // Optionally, delete related subcollections such as drawings, certifications, etc.
-        final subCollections = [
-          'drawings',
-          'certifications'
-        ]; // Add more if needed
+      // Optionally, delete related subcollections such as drawings, certifications, etc.
+      final subCollections = ['specificWorks']; // Add more if needed
 
-        // Loop through subcollections and delete each document
-        for (String subCollection in subCollections) {
-          final QuerySnapshot subCollectionSnapshot =
-              await workOrderRef.collection(subCollection).get();
+      // Loop through subcollections and delete each document
+      for (String subCollection in subCollections) {
+        final QuerySnapshot subCollectionSnapshot =
+            await workOrderRef.collection(subCollection).get();
 
-          for (QueryDocumentSnapshot doc in subCollectionSnapshot.docs) {
-            await doc.reference.delete();
-          }
+        for (QueryDocumentSnapshot doc in subCollectionSnapshot.docs) {
+          await doc.reference.delete();
         }
-
-        // Finally, delete the main work order document
-        await workOrderRef.delete();
-
-        // Show success feedback to the user
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Work order deleted successfully')),
-        );
-
-        // Navigate back to the HomePage
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-          (route) => false, // Removes all previous routes
-        );
-      } catch (e) {
-        // Handle any errors
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete work order: $e')),
-        );
-      } finally {
-        setState(() {
-          _isLoading = false; // Hide loading icon
-        });
       }
+
+      // Delete files from Firebase Storage
+      final storage = FirebaseStorage.instance;
+
+      // Deleting specific work images
+      final specificWorkImagesRef = storage
+          .ref()
+          .child('SpecificWorkImages/$workOrderNumber');
+      final listSpecificFiles = await specificWorkImagesRef.listAll();
+      for (var item in listSpecificFiles.items) {
+        await item.delete();
+      }
+
+      // Deleting work photos
+      final workPhotosRef = storage.ref().child('workphotos/$workOrderNumber.jpg');
+      await workPhotosRef.delete();
+
+      // Finally, delete the main work order document
+      await workOrderRef.delete();
+
+      // Show success feedback to the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Work order deleted successfully')),
+      );
+
+      // Navigate back to the HomePage
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+        (route) => false, // Removes all previous routes
+      );
+    } catch (e) {
+      // Handle any errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete work order: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false; // Hide loading icon
+      });
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -363,9 +378,9 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                       ),
                                     ),
                                   ),
-                                  if(_isAllowed)
+                                  
                                 SizedBox(height: screenWidth * 0.02),
-                                if(_isAllowed)
+                               
                                 if (_userRole == 'ADMIN' ||
                                     _userRole == 'Manager' ||
                                     _userRole == 'Editor')
@@ -383,7 +398,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                       child: const ListTile(
                                         leading: Icon(Icons.delete,
                                             color: Colors.white, size: 30),
-                                        title: const Text(
+                                        title: Text(
                                           'Delete this Work',
                                           style: TextStyle(
                                             fontSize: 18,

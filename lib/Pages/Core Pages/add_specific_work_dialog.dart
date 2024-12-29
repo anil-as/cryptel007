@@ -123,7 +123,7 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
       final machine = machineController.text;
       final workcenter = workcenterController.text;
       final drawingnumber = drawingnumberController.text;
-      final operator = operatorController.text;
+      final operators = operatorController.text;
 
       String? imageUrl = await _uploadImage(id);
 
@@ -136,12 +136,12 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
             .set({
           'name': name,
           'id': id,
-          'drawingnumber':drawingnumber,
+          'drawingnumber': drawingnumber,
           'rawmaterial': rawmaterial,
           'rmsize': rmsize,
           'rmc': rmc,
           'drawingno': drawingnumber,
-          'operator':operator,
+          'operator': operators,
           'machine': machine,
           'workcenter': workcenter,
           'quantity': quantity,
@@ -272,10 +272,10 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
                               return null;
                             },
                           ),
-                           _buildTextField(
+                          _buildTextField(
                             'Operators',
                             operatorController,
-                            suffixIcon: Icons.man,
+                            suffixIcon: Icons.engineering,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter Operators allotted';
@@ -323,17 +323,6 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter the Machine allotted';
-                              }
-                              return null;
-                            },
-                          ),
-                          _buildTextField(
-                            'drawingno',
-                            drawingnumberController,
-                            suffixIcon: Icons.engineering,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter Drawing Number';
                               }
                               return null;
                             },

@@ -100,7 +100,7 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
           isLoading = true;
         });
         final storageRef = FirebaseStorage.instance.ref().child(
-            'SpecificWorkImages/${widget.workOrderNumber}/$widget.workId.jpg');
+            'SpecificWorkImages/${widget.workOrderNumber}/${widget.workId}.jpg');
         await storageRef.putFile(_imageFile!);
         _imageUrl = await storageRef.getDownloadURL();
       }
@@ -143,6 +143,18 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
         .collection('specificWorks')
         .doc(widget.workId)
         .delete();
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery); // Changed to gallery
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+        _imageUrl = null; // Reset the URL if a new image is picked
+      });
+    }
   }
 
   @override
@@ -193,6 +205,10 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
                       imageUrl: _imageUrl,
                       pickImage: _pickImage,
                     ),
+                    ElevatedButton(
+                      onPressed: _pickImage,
+                      child: const Text('Edit Image'),
+                    ),
                     TextFieldWidget(
                         controller: _nameController,
                         label: 'Work Name',
@@ -238,64 +254,70 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
                       },
                     ),
                     const SizedBox(height: 25),
-                    // Quantity Field with Manual Input
-                    TextFormField(
-                      controller: _quantityController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: 'Quantity',
-                        hintText: 'Enter quantity manually',
-                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                        border: OutlineInputBorder(),
+                    // Quantity Fields Side by Side
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _quantityController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: 'Quantity',
+                              hintText: 'Enter quantity manually',
+                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                              border: OutlineInputBorder(),
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                _quantity = int.tryParse(value) ?? 0;
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        // Quantity Selector
+                        QuantityField(
+                          quantity: _quantity,
+                          onDecrease: () {
+                            setState(() {
+                              if (_quantity > 0) _quantity--;
+                            });
+                            _quantityController.text = _quantity.toString();
+                          },
+                          onIncrease: () {
+                            setState(() {
+                              _quantity++;
+                            });
+                            _quantityController.text = _quantity.toString();
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+                    // Completion Section with border
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      onChanged: (value) {
-                        setState(() {
-                          _quantity = int.tryParse(value) ?? 0;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    // Wider Quantity Selector
-                    QuantityField(
-                      quantity: _quantity,
-                      onDecrease: () {
-                        setState(() {
-                          if (_quantity > 0) _quantity--;
-                        });
-                        _quantityController.text = _quantity.toString();
-                      },
-                      onIncrease: () {
-                        setState(() {
-                          _quantity++;
-                        });
-                        _quantityController.text = _quantity.toString();
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    // Percentage Selector with Wider Input
-                    PercentageSelector(
-                      completion: _completion,
-                      onChanged: (value) {
-                        setState(() {
-                          _completion = value;
-                          _completionController.text = value.toStringAsFixed(0);
-                        });
-                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: PercentageSelector(
+                          completion: _completion,
+                          onChanged: (value) {
+                            setState(() {
+                              _completion = value;
+                              _completionController.text = value.toStringAsFixed(0);
+                            });
+                          },
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
     );
-  }
-
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null) {
-        _imageFile = File(pickedFile.path);
-      }
-    });
   }
 }
