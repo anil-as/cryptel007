@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cryptel007/Pages/Core%20Pages/work_detail_page.dart';
 import 'package:cryptel007/Pages/Navigation%20Pages/home_page.dart';
 import 'package:cryptel007/Tools/colors.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:intl/intl.dart';
 
 class BookmarkPage extends StatefulWidget {
   const BookmarkPage({super.key});
@@ -70,12 +72,12 @@ class _BookmarkPageState extends State<BookmarkPage> {
             (doc) => (doc.data() as Map<String, dynamic>)['workOrderNumber'] == workOrderNumber);
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Bookmark removed successfully')),
+        const SnackBar(content: Text('Bookmark removed successfully')),
       );
     } catch (e) {
       print('Error removing bookmark: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to remove bookmark')),
+        const SnackBar(content: Text('Failed to remove bookmark')),
       );
     }
   }
@@ -111,16 +113,16 @@ class _BookmarkPageState extends State<BookmarkPage> {
                     ),
                   ),
                 )
-              : GridView.builder(
-                  padding: const EdgeInsets.all(8.0),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 8.0,
-                    mainAxisSpacing: 8.0,
-                    childAspectRatio: 1.0,
-                  ),
+              : CarouselSlider.builder(
                   itemCount: _bookmarkedWorks.length,
-                  itemBuilder: (context, index) {
+                  options: CarouselOptions(
+                    height: MediaQuery.of(context).size.height * 0.85,
+                    autoPlay: false,
+                    enlargeCenterPage: true,
+                    aspectRatio: 2.0,
+                    viewportFraction: 0.9,
+                  ),
+                  itemBuilder: (context, index, realIdx) {
                     final doc = _bookmarkedWorks[index];
                     final data = doc.data() as Map<String, dynamic>;
                     final workOrderNumber = data['workOrderNumber'];
@@ -128,8 +130,7 @@ class _BookmarkPageState extends State<BookmarkPage> {
                     return FutureBuilder<Map<String, dynamic>?>(
                       future: _fetchWorkDetails(workOrderNumber),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
                           return const Card(
                             elevation: 4,
                             child: Center(child: CircularProgressIndicator()),
@@ -144,97 +145,100 @@ class _BookmarkPageState extends State<BookmarkPage> {
                         }
 
                         final workDetails = snapshot.data;
+                        final createdDate = workDetails?['CDATE'] != null
+                            ? (workDetails!['CDATE'] as Timestamp).toDate()
+                            : null;
+
+                        final formattedDate = createdDate != null
+                            ? DateFormat('dd MMM yyyy').format(createdDate)
+                            : 'N/A';
 
                         return Card(
                           elevation: 10,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => WorkDetailPage(
-                                    workOrderNumber: workOrderNumber,
-                                  ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Work Order: $workOrderNumber',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Title: ${workDetails?['WORKTITLE'] ?? 'N/A'}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Customer: ${workDetails?['CUSTOMERNAME'] ?? 'N/A'}',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      'Created Date: $formattedDate',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [Colors.blueGrey.shade900, Colors.blue.shade600],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.3),
-                                    spreadRadius: 2,
-                                    blurRadius: 8,
-                                    offset: Offset(0, 4),
-                                  ),
-                                ],
                               ),
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              if (workDetails?['PHOTO'] != null)
+                                Expanded(
+                                  child: Image.network(
+                                    workDetails!['PHOTO'],
+                                    width: double.infinity,
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                                ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    'Work Order: $workOrderNumber',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
+                                  TextButton.icon(
+                                    onPressed: () async {
+                                      final GoogleSignInAccount? user =
+                                          _googleSignIn.currentUser;
+                                      if (user != null) {
+                                        await _removeBookmark(
+                                            user.email!, workOrderNumber);
+                                      }
+                                    },
+                                    icon: const Icon(Icons.star_outline),
+                                    label: const Text('Unstar'),
                                   ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    'Title: ${workDetails?['WORKTITLE'] ?? 'N/A'}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Customer: ${workDetails?['CUSTOMERNAME'] ?? 'N/A'}',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white54,
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(
-                                          Icons.delete,
-                                          color: Colors.white,
+                                  TextButton.icon(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => WorkDetailPage(
+                                            workOrderNumber: workOrderNumber,
+                                          ),
                                         ),
-                                        onPressed: () async {
-                                          final GoogleSignInAccount? user =
-                                              _googleSignIn.currentUser;
-                                          if (user != null) {
-                                            await _removeBookmark(
-                                                user.email!, workOrderNumber);
-                                          }
-                                        },
-                                      ),
-                                      Icon(
-                                        Icons.arrow_forward_ios,
-                                        color: Colors.white.withOpacity(0.9),
-                                        size: 22,
-                                      ),
-                                    ],
+                                      );
+                                    },
+                                    icon: const Icon(Icons.details),
+                                    label: const Text('Details'),
                                   ),
                                 ],
-                              ),
-                            ),
+                              )
+                            ],
                           ),
                         );
                       },

@@ -52,18 +52,18 @@ class _StatusPageState extends State<StatusPage> {
   List<Map<String, dynamic>> tasks = [
     {"title": "METALCUTTING", "status": "Not Started"},
     {"title": "ROUGHING", "status": "Not Started"},
+    {"title": "AGEING", "status": "Not Started"},
     {"title": "H.T", "status": "Not Started"},
     {"title": "FINISH TURNING", "status": "Not Started"},
     {"title": "FINISH MILLING", "status": "Not Started"},
     {"title": "EDM", "status": "Not Started"},
+    {"title": "WIRE CUT", "status": "Not Started"},
     {"title": "FITTING", "status": "Not Started"},
     {"title": "INSPECTION", "status": "Not Started"},
     {"title": "CUSTOMER INSPECTION", "status": "Not Started"},
     {"title": "SURFACE TREATMENT", "status": "Not Started"},
     {"title": "VISUAL INSPECTION", "status": "Not Started"},
     {"title": "DELIVERY", "status": "Not Started"},
-    {"title": "AGEING", "status": "Not Started"},
-    {"title": "WIRE CUT", "status": "Not Started"},
   ];
 
   // List of possible statuses
