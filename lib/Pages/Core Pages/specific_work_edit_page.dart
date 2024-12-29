@@ -76,7 +76,6 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
         rmsizeController.text = data['rmsize'] ?? '';
         rmcController.text = data['rmc'] ?? '';
         machineController.text = data['machine'] ?? '';
-        operatorController.text = data['operator'] ?? '';
         workcenterController.text = data['workcenter'] ?? '';
         drawingnumberController.text = data['drawingnumber'] ?? '';
         _expectedDate = DateTime.tryParse(data['expectedDeliveryDate'] ?? '') ??
@@ -117,7 +116,6 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
         'rawmaterial': rawmaterialController.text,
         'rmsize': rmsizeController.text,
         'rmc': rmcController.text,
-        'operator': operatorController.text,
         'machine': machineController.text,
         'workcenter': workcenterController.text,
         'expectedDeliveryDate':
@@ -217,9 +215,9 @@ class _SpecificWorkEditPageState extends State<SpecificWorkEditPage> {
                         label: 'Machine',
                         hint: 'Enter Machine allotted'),
                     TextFieldWidget(
-                        controller: operatorController,
-                        label: 'Operators',
-                        hint: 'Enter Operators allotted'),
+                        controller: drawingnumberController,
+                        label: 'Drawing Number',
+                        hint: 'Enter Drawing Number'),
                     TextFieldWidget(
                         controller: workcenterController,
                         label: 'Work Center',

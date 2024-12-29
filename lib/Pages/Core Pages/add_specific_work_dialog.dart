@@ -121,7 +121,6 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
       final rmsize = rmsizeController.text;
       final rmc = rmcController.text;
       final machine = machineController.text;
-      final operators = operatorController.text;
       final workcenter = workcenterController.text;
       final drawingnumber = drawingnumberController.text;
 
@@ -140,7 +139,7 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
           'rawmaterial': rawmaterial,
           'rmsize': rmsize,
           'rmc': rmc,
-          'operator': operators,
+          'drawingno': drawingnumber,
           'machine': machine,
           'workcenter': workcenter,
           'quantity': quantity,
@@ -316,12 +315,12 @@ class _AddWorkDialogContentState extends State<AddWorkDialogContent> {
                             },
                           ),
                           _buildTextField(
-                            'Operator',
-                            operatorController,
+                            'drawingno',
+                            drawingnumberController,
                             suffixIcon: Icons.engineering,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter Operators allotted';
+                                return 'Please enter Drawing Number';
                               }
                               return null;
                             },
